@@ -1,0 +1,497 @@
+# DEFFATEST Backend Compatibility Requirements
+
+## Overview
+This document outlines the comprehensive backend requirements for the DEFFATEST AI-powered testing platform. The backend must be fully compatible with the frontend implementation and handle all necessary functionality including user management, test processing, payment integration, and webhook handling.
+
+## 1. Database Schema
+
+The backend must implement the exact database schema as defined in the frontend, with the following tables:
+
+### `profiles` Table
+```sql
+CREATE TABLE public.profiles (
+  user_id uuid PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+  email text NOT NULL,
+  full_name text,
+  company_name text,
+  industry text DEFAULT 'Other',
+  plan_type text DEFAULT 'free',
+  api_key text UNIQUE DEFAULT gen_random_uuid()::text,
+  created_at timestamptz DEFAULT now(),
+  paddle_customer_id text,
+  paddle_subscription_id text,
+  current_billing_period_ends_at timestamptz,
+  subscription_status text DEFAULT 'FREE' NOT NULL,
+  tests_this_month_count integer DEFAULT 0 NOT NULL,
+  last_monthly_reset_date date,
+  concurrent_test_slots integer DEFAULT 1 NOT NULL,
+  max_test_duration_minutes integer DEFAULT 5 NOT NULL,
+  phone_number text,
+  country text,
+  plan_price_amount numeric,
+  plan_price_currency text,
+  next_billing_date timestamptz
+);
+```
+
+### `tests` Table
+```sql
+CREATE TABLE public.tests (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id uuid REFERENCES profiles(user_id) ON DELETE CASCADE NOT NULL,
+  test_name text NOT NULL,
+  test_type text NOT NULL CHECK (test_type IN ('web_url', 'web_bundle', 'android_apk')),
+  test_source_url text,
+  status text DEFAULT 'queued' CHECK (status IN ('queued', 'running', 'processing_results', 'completed', 'failed', 'cancelled')),
+  requested_duration_minutes integer DEFAULT 5 NOT NULL,
+  test_file_path text,
+  plan_type_at_submission text DEFAULT 'free' NOT NULL,
+  progress integer DEFAULT 0 NOT NULL,
+  estimated_completion_time timestamptz,
+  submitted_at timestamptz DEFAULT now(),
+  started_at timestamptz,
+  completed_at timestamptz,
+  report_download_url text,
+  bug_count integer DEFAULT 0 NOT NULL,
+  CONSTRAINT unique_test_id_per_user UNIQUE (id, user_id)
+);
+```
+
+### `bug_reports` Table
+```sql
+CREATE TABLE public.bug_reports (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  test_id uuid REFERENCES tests(id) ON DELETE CASCADE NOT NULL,
+  severity text NOT NULL CHECK (severity IN ('low', 'medium', 'high', 'critical')),
+  title text NOT NULL,
+  description text NOT NULL,
+  reproduction_steps text NOT NULL,
+  screenshot_url text,
+  video_url text,
+  created_at timestamptz DEFAULT now()
+);
+```
+
+### `api_keys` Table
+```sql
+CREATE TABLE public.api_keys (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id uuid REFERENCES profiles(user_id) ON DELETE CASCADE NOT NULL,
+  name text NOT NULL,
+  api_key_hash text NOT NULL,
+  is_active boolean DEFAULT true NOT NULL,
+  created_at timestamptz DEFAULT now() NOT NULL,
+  expires_at timestamptz
+);
+```
+
+### `processed_webhooks` Table
+```sql
+CREATE TABLE public.processed_webhooks (
+  id text PRIMARY KEY,
+  event_type text NOT NULL,
+  processed_at timestamptz DEFAULT now() NOT NULL,
+  status text DEFAULT 'success' NOT NULL
+);
+```
+
+## 2. Authentication & User Management
+
+### User Registration
+- Implement email/password registration
+- Create profile record on registration
+- Set default plan to 'free'
+- Set default subscription_status to 'FREE'
+- Set default concurrent_test_slots to 1
+- Set default max_test_duration_minutes to 5
+
+### User Login
+- Implement JWT-based authentication
+- Return user profile data with login response
+- Handle password reset functionality
+
+### Profile Management
+- Allow users to update their profile information
+- Restrict updates to only allowed fields (full_name, company_name, industry, etc.)
+- Implement password change functionality
+
+## 3. Test Management
+
+### Test Submission
+- Accept test submissions with validation
+- Support three test types: web_url, web_bundle, android_apk
+- For file uploads, store in secure storage with appropriate access controls
+- Validate test duration against user's plan limits
+- Enforce concurrent test slot limits based on user's plan
+- Update tests_this_month_count when a test is submitted
+
+### Test Queue Management
+- Implement priority-based queue system:
+  - Chaos plan: Highest priority
+  - Pro plan: Medium priority
+  - Free plan: Lowest priority
+- Track and enforce concurrent test slot limits
+- Update test status and progress in real-time
+
+### Test Execution
+- Process tests based on type (web_url, web_bundle, android_apk)
+- Update test status throughout execution lifecycle:
+  - queued -> running -> processing_results -> completed/failed
+  - Update progress percentage during each phase
+- Generate detailed bug reports with severity levels
+- Store screenshots and videos in secure storage
+- Create downloadable report archives
+
+### Test Results
+- Provide detailed test reports with bug information
+- Include performance metrics and security findings when applicable
+- Generate secure, time-limited download URLs for reports
+
+## 4. Payment Integration with Paddle
+
+### Paddle Configuration
+- Use the exact product and price IDs:
+  - Free plan: product ID "pro_01jz3ee4whjwf0bsb0n0k779pw", price ID "pri_01jz3ekbgqj5m5aese86kwpfxp"
+  - Pro plan: product ID "pro_01jz3epy40cqfamphkhxvnh2sc", price ID "pri_01jz3erkb3pft3ecw0dcz03yn2"
+  - Chaos plan: product ID "pro_01jz3et66qhbxsxz0rm3751f8k", price ID "pri_01jz3ewz3rr7n92a26wf4s86ye"
+- Use client side token "live_09ed53acf46a3d5e4cc657c32bf"
+- Use webhook secret "ntfset_01jz3f3edwwmee1cd9z6gjgcr3"
+- Seller ID: "236561"
+- Set environment to "production" (not sandbox)
+
+### Webhook Handling
+- Implement webhook endpoint at `https://deffatest.online/api/webhook/paddle`
+- Listen on port 8000 or configure reverse proxy accordingly
+- Verify webhook signatures for security using HMAC-SHA256
+- Process both Paddle Classic and Paddle v2 webhook formats
+- Implement idempotency to prevent duplicate processing using processed_webhooks table
+- Handle the following webhook events:
+  - transaction.completed
+  - subscription.created
+  - subscription.updated
+  - subscription.cancelled
+
+### Plan Management
+- Update user profiles based on webhook data:
+  - Update plan_type based on purchase
+  - Set subscription_status to "ACTIVE" for new subscriptions
+  - Store paddle_customer_id and paddle_subscription_id
+  - Update current_billing_period_ends_at and next_billing_date
+  - Reset tests_this_month_count on plan upgrade
+  - Update concurrent_test_slots and max_test_duration_minutes based on plan
+
+### Plan Features by Type
+- Free Plan:
+  - 1 test per month
+  - 5 minute max test duration
+  - 1 concurrent test slot
+  - Standard queue priority
+  - No API access
+
+- Pro Plan:
+  - 25 tests per month
+  - 2 hour max test duration
+  - 4 concurrent test slots (2 web, 2 app)
+  - Priority queue
+  - Detailed test logs
+  - No API access
+
+- Chaos Plan:
+  - Unlimited tests
+  - 6 hour max test duration
+  - 8 concurrent test slots (4 web, 4 app)
+  - Instant queue
+  - API access
+  - Advanced analytics
+
+## 5. API Key Management (Chaos Plan Only)
+
+### API Key Generation
+- Only allow Chaos plan users to generate API keys
+- Format: `sk-deffatest-{32-char-random-string}`
+- Display name format: `df_{first-8-chars-of-random}`
+- Store hashed keys only, never raw keys
+- Return full key to user only once
+
+### API Key Validation
+- Verify API key hash matches stored hash
+- Confirm key is active and not expired
+- Verify user still has active Chaos plan
+- Track API key usage
+
+### API Key Management
+- Allow users to view their API keys (without the full key)
+- Allow users to activate/deactivate keys
+- Allow users to delete keys
+- Set optional expiration dates for keys
+
+## 6. Real-time Updates
+
+### WebSocket Implementation
+- Provide real-time test status updates
+- Connect to `wss://api.deffatest.online/ws` or similar endpoint
+- Send progress updates during test execution
+- Notify users of newly discovered bugs
+- Update test completion status
+
+### Event Types
+- test.progress: Updates on test progress percentage
+  ```json
+  {
+    "event": "test.progress",
+    "data": {
+      "test_id": "550e8400-e29b-41d4-a716-446655440000",
+      "progress": 65,
+      "status": "running",
+      "message": "AI is actively testing your application"
+    }
+  }
+  ```
+
+- test.status_change: Notification of test status changes
+  ```json
+  {
+    "event": "test.status_change",
+    "data": {
+      "test_id": "550e8400-e29b-41d4-a716-446655440000",
+      "previous_status": "running",
+      "new_status": "processing_results",
+      "timestamp": "2025-07-01T12:15:00Z",
+      "message": "Test completed, processing results"
+    }
+  }
+  ```
+
+- test.bug_found: Real-time bug discovery notifications
+  ```json
+  {
+    "event": "test.bug_found",
+    "data": {
+      "test_id": "550e8400-e29b-41d4-a716-446655440000",
+      "bug_id": "bug-1",
+      "severity": "critical",
+      "title": "Checkout button unresponsive on mobile viewport",
+      "timestamp": "2025-07-01T12:10:30Z"
+    }
+  }
+  ```
+
+- test.completed: Test completion with results summary
+  ```json
+  {
+    "event": "test.completed",
+    "data": {
+      "test_id": "550e8400-e29b-41d4-a716-446655440000",
+      "completed_at": "2025-07-01T12:15:00Z",
+      "bug_count": {
+        "critical": 2,
+        "major": 5,
+        "minor": 8,
+        "total": 15
+      },
+      "report_download_url": "https://storage.r2.cloudflarestorage.com/test-reports/550e8400-e29b-41d4-a716-446655440000/full_report.zip"
+    }
+  }
+  ```
+
+## 7. Monthly Reset Function
+
+Implement a scheduled function that runs daily to reset tests_this_month_count:
+
+```sql
+CREATE OR REPLACE FUNCTION reset_monthly_tests()
+RETURNS void
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+BEGIN
+    UPDATE profiles
+    SET 
+        tests_this_month_count = 0,
+        last_monthly_reset_date = CURRENT_DATE
+    WHERE 
+        (last_monthly_reset_date IS NULL OR 
+         last_monthly_reset_date < (CURRENT_DATE - INTERVAL '1 month')) AND
+        subscription_status IN ('ACTIVE', 'TRIALING', 'FREE');
+END;
+$$;
+```
+
+## 8. Security Requirements
+
+### Row Level Security
+- Enable RLS on all tables
+- Create policies to ensure users can only access their own data
+- Implement service role access for system operations
+
+### API Security
+- Implement rate limiting for API endpoints
+- Validate all request parameters
+- Sanitize user inputs
+- Set appropriate CORS policies
+- Implement proper error handling
+
+### Data Protection
+- Store sensitive data securely
+- Implement proper access controls
+- Use secure, temporary URLs for file downloads
+- Set appropriate permissions on uploaded files
+
+## 9. Webhook Endpoints
+
+### Paddle Webhook
+- Endpoint: `https://deffatest.online/api/webhook/paddle`
+- Method: POST
+- Purpose: Process payment and subscription events
+- Implementation:
+  1. Verify webhook signature using PADDLE_WEBHOOK_SECRET
+  2. Check for duplicate events using processed_webhooks table
+  3. Process event based on event_type
+  4. Update user profile with new plan details
+  5. Record webhook as processed
+
+### Test Status Webhook
+- Endpoint: `https://deffatest.online/api/webhook/test-status`
+- Method: POST
+- Purpose: Receive updates from test workers
+- Implementation:
+  1. Verify webhook signature
+  2. Update test status, progress, and results
+  3. Create bug reports for discovered issues
+  4. Send real-time notifications via WebSockets
+
+## 10. API Endpoints
+
+Implement the following API endpoints to match frontend expectations:
+
+### User Profile
+- GET https://api.deffatest.online/api/user/profile
+- PUT https://api.deffatest.online/api/user/profile
+- GET https://api.deffatest.online/api/user/plan
+- GET https://api.deffatest.online/api/user/paddle-portal-link
+
+### Test Management
+- POST https://api.deffatest.online/api/tests/submit
+- GET https://api.deffatest.online/api/tests/history
+- GET https://api.deffatest.online/api/tests/live
+- GET https://api.deffatest.online/api/tests/{testId}/status
+- GET https://api.deffatest.online/api/tests/{testId}/report
+- DELETE https://api.deffatest.online/api/tests/{testId}
+- GET https://api.deffatest.online/api/tests/summary (dashboard overview)
+
+### API Key Management
+- GET https://api.deffatest.online/api/v1/api-keys
+- POST https://api.deffatest.online/api/v1/api-keys/generate
+- PUT https://api.deffatest.online/api/v1/api-keys/status/{keyId}
+- DELETE https://api.deffatest.online/api/v1/api-keys/revoke/{keyId}
+
+## 11. Implementation Notes
+
+### Paddle Webhook Processing
+The backend must handle both Paddle Classic and Paddle v2 webhook formats:
+
+1. For Paddle Classic webhooks:
+   - Identify by presence of `alert_name` field
+   - Generate a unique webhook ID
+   - Process based on alert_name (subscription_created, subscription_payment_succeeded, etc.)
+
+2. For Paddle v2 webhooks:
+   - Identify by presence of `event_type` field
+   - Use the provided webhook ID
+   - Process based on event_type (transaction.completed, subscription.updated, etc.)
+   - Verify signature using:
+     ```
+     const signature = req.headers.get("Paddle-Signature");
+     const parts = signature.split(";");
+     const timestamp = parts[0].split("=")[1];
+     const hmacSignature = parts[1].split("=")[1];
+     ```
+
+3. For both formats:
+   - Find the user by email or subscription ID
+   - Determine the plan type from product/price ID
+   - Update the user's profile with new plan details
+   - Record the webhook as processed to prevent duplicate processing
+
+### Test Status Workflow
+The test processing workflow includes these status transitions:
+
+1. `queued`: Initial state when test is submitted, waiting in queue
+2. `running`: Test is actively being executed by AI
+3. `processing_results`: Test execution completed, processing and analyzing results
+4. `completed`: Test fully completed with results available
+5. `failed`: Test failed due to error
+6. `cancelled`: Test was cancelled by user
+
+The progress field should be updated during each phase:
+- queued: 0%
+- running: 10% to 90% (incremental updates)
+- processing_results: 90% to 99%
+- completed/failed/cancelled: 100%
+
+### Plan Upgrade Process
+When a user upgrades their plan:
+1. Update plan_type to the new plan
+2. Set subscription_status to "ACTIVE"
+3. Store paddle_customer_id and paddle_subscription_id
+4. Update current_billing_period_ends_at and next_billing_date
+5. Update concurrent_test_slots based on plan:
+   - Free: 1 slot
+   - Pro: 4 slots
+   - Chaos: 8 slots
+6. Update max_test_duration_minutes based on plan:
+   - Free: 5 minutes
+   - Pro: 120 minutes (2 hours)
+   - Chaos: 360 minutes (6 hours)
+7. Reset tests_this_month_count to 0
+8. Update last_monthly_reset_date to current date
+
+### Plan Downgrade Process
+When a subscription is cancelled:
+1. Update plan_type to "free"
+2. Set subscription_status to "CANCELLED"
+3. Reset concurrent_test_slots to 1
+4. Reset max_test_duration_minutes to 5
+5. Clear current_billing_period_ends_at and next_billing_date
+
+## 12. Testing Requirements
+
+Ensure thorough testing of:
+1. User registration and authentication
+2. Test submission and processing
+3. Paddle webhook handling
+4. Plan upgrades and downgrades
+5. API key generation and validation
+6. Monthly test count reset
+7. Real-time updates via WebSockets
+
+## 13. Deployment Considerations
+
+1. Set up proper environment variables:
+   ```
+   SUPABASE_URL=https://ynbitwtfxdcenyogsdyv.supabase.co
+   SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+   PADDLE_WEBHOOK_SECRET=ntfset_01jz3f3edwwmee1cd9z6gjgcr3
+   JWT_SECRET=your-secret-here
+   PADDLE_CLIENT_TOKEN=live_09ed53acf46a3d5e4cc657c32bf
+   PADDLE_SELLER_ID=236561
+   ```
+
+2. Configure webhook endpoints in Paddle dashboard:
+   - Set webhook URL to: https://deffatest.online/api/webhook/paddle
+   - Enable all relevant webhook events
+   - Use "Billing V2" endpoints in Paddle dashboard
+
+3. Set up proper CORS configuration for API endpoints:
+   ```
+   Access-Control-Allow-Origin: https://deffatest.online
+   Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS
+   Access-Control-Allow-Headers: Content-Type, Authorization, Paddle-Signature
+   ```
+
+4. Set up scheduled tasks for monthly test count reset
+
+5. Implement proper logging and monitoring
+
+This comprehensive backend implementation will ensure full compatibility with the DEFFATEST frontend and provide all necessary functionality for the AI-powered testing platform.
