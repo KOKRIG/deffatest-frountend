@@ -1,7 +1,7 @@
 // API Endpoints Configuration for DEFFATEST
 // This file contains all the API endpoint definitions and helper functions
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.deffatest.com';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.deffatest.online';
 
 // API Endpoints
 export const API_ENDPOINTS = {
