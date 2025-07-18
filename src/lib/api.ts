@@ -545,41 +545,6 @@ export const setupApiInterceptors = (getAuthToken: () => string | null) => {
   };
 };
 
-// Paddle integration
-export const PADDLE_CONFIG = {
-  FREE_PLAN_PRODUCT_ID: 'pro_01jys17jmjfy20rahzg3qgjphv',
-  FREE_PLAN_PRICE_ID: 'pri_01jys19g37z7yy99zncv50rghn',
-  PRO_PLAN_PRODUCT_ID: 'pro_01jys1hcpxgyrqx37vhpfaden7',
-  PRO_PLAN_PRICE_ID: 'pri_01jys1hcpxgyrqx37vhpfaden7',
-  CHAOS_PLAN_PRODUCT_ID: 'pro_01jys1nb75f6p4cx2ad6pxg0e7',
-  CHAOS_PLAN_PRICE_ID: 'pri_01jys1q85m44rjw1w1csssaank',
-  CLIENT_SIDE_TOKEN: import.meta.env.VITE_PADDLE_CLIENT_TOKEN || 'live_09ed53acf46a3d5e4cc657c32bf'
-};
-
-// Initialize Paddle
-export const initializePaddle = () => {
-  if (typeof window !== 'undefined' && window.Paddle) {
-    if (window.Paddle.Environment && typeof window.Paddle.Environment.set === 'function') {
-      window.Paddle.Environment.set('production');
-    }
-    
-    if (typeof window.Paddle.Initialize === 'function') {
-      window.Paddle.Initialize({
-        token: PADDLE_CONFIG.CLIENT_SIDE_TOKEN,
-      });
-    } else {
-      console.error('Paddle.Initialize is not a function. Make sure you are using Paddle Billing v2.');
-    }
-  }
-};
-
-// Open Paddle checkout
-export const openPaddleCheckout = (options: PaddleCheckoutOptions) => {
-  if (typeof window !== 'undefined' && window.Paddle && window.Paddle.Checkout) {
-    window.Paddle.Checkout.open(options);
-  } else {
-    console.error('Paddle is not initialized or Paddle.Checkout is not available');
-  }
-};
+// Paddle integration removed from api.ts - use paddle.ts instead
 
 export default apiClient;

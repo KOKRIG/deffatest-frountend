@@ -28,7 +28,8 @@ import {
   RefreshCw
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import { apiClient, TestHistoryItem, LiveTestItem, UserPlanResponse, handleApiError } from '../lib/api';
+import { apiClient, handleApiError } from '../lib/api';
+import { supabase, Profile, Test } from '../lib/supabase';
 
 interface UserPlan {
   planType: string;
@@ -62,8 +63,8 @@ function Upload() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeSection, setActiveSection] = useState<'choose' | 'web' | 'app'>('choose');
   const [userPlan, setUserPlan] = useState<UserPlan | null>(null);
-  const [liveTests, setLiveTests] = useState<LiveTestItem[]>([]);
-  const [testHistory, setTestHistory] = useState<TestHistoryItem[]>([]);
+  const [liveTests, setLiveTests] = useState<Test[]>([]);
+  const [testHistory, setTestHistory] = useState<Test[]>([]);
   const [historyLoading, setHistoryLoading] = useState(true);
   const [historyOffset, setHistoryOffset] = useState(0);
   const [hasMoreHistory, setHasMoreHistory] = useState(false);
@@ -136,28 +137,33 @@ function Upload() {
 
   const fetchUserPlan = async () => {
     try {
-      const response = await apiClient.getUserPlan();
+      if (!user?.id) return;
       
-      if (response.success && response.data) {
-        const planData = response.data;
-        const planType = planData.plan_type || 'free';
-        const maxConcurrentTests = planData.concurrent_test_slots || (planType === 'free' ? 1 : planType === 'pro' ? 4 : 8);
-        
-        setUserPlan({
-          planType,
-          maxConcurrentTests,
-          availableDurations: DURATION_OPTIONS
-            .filter(option => {
-              if (planType === 'free') return option.planRequirement === 'free';
-              if (planType === 'pro') return ['free', 'pro'].includes(option.planRequirement);
-              return true; // chaos can access all
-            })
-            .map(option => option.value),
-          currentActiveTests: 0 // Will be updated by fetchLiveTests
-        });
-      } else {
-        throw new Error(response.error || 'Failed to fetch user plan');
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('user_id', user.id)
+        .single();
+      
+      if (profileError) {
+        throw new Error(`Failed to fetch profile: ${profileError.message}`);
       }
+      
+      const planType = profileData.plan_type || 'free';
+      const maxConcurrentTests = profileData.concurrent_test_slots || (planType === 'free' ? 1 : planType === 'pro' ? 4 : 8);
+      
+      setUserPlan({
+        planType,
+        maxConcurrentTests,
+        availableDurations: DURATION_OPTIONS
+          .filter(option => {
+            if (planType === 'free') return option.planRequirement === 'free';
+            if (planType === 'pro') return ['free', 'pro'].includes(option.planRequirement);
+            return true; // chaos can access all
+          })
+          .map(option => option.value),
+        currentActiveTests: 0 // Will be updated by fetchLiveTests
+      });
     } catch (error) {
       console.error('Error fetching user plan:', error);
       setError(handleApiError(error instanceof Error ? error.message : 'Failed to fetch user plan'));
@@ -166,17 +172,24 @@ function Upload() {
 
   const fetchLiveTests = async () => {
     try {
-      const response = await apiClient.getLiveTests();
+      if (!user?.id) return;
       
-      if (response.success && response.data) {
-        setLiveTests(response.data);
-        
-        // Update current active tests count
-        if (userPlan) {
-          setUserPlan(prev => prev ? { ...prev, currentActiveTests: response.data.length } : null);
-        }
-      } else {
-        throw new Error(response.error || 'Failed to fetch live tests');
+      const { data: liveTestsData, error: liveTestsError } = await supabase
+        .from('tests')
+        .select('*')
+        .eq('user_id', user.id)
+        .in('status', ['queued', 'running', 'processing_results'])
+        .order('submitted_at', { ascending: false });
+      
+      if (liveTestsError) {
+        throw new Error(`Failed to fetch live tests: ${liveTestsError.message}`);
+      }
+      
+      setLiveTests(liveTestsData || []);
+      
+      // Update current active tests count
+      if (userPlan) {
+        setUserPlan(prev => prev ? { ...prev, currentActiveTests: liveTestsData?.length || 0 } : null);
       }
     } catch (error) {
       console.error('Error fetching live tests:', error);
@@ -188,37 +201,48 @@ function Upload() {
     try {
       setHistoryLoading(!append);
       
-      const params = {
-        offset,
-        limit: 10,
-        sortBy: sortBy as any,
-        filterByType: filterBy === 'all' ? undefined : filterBy === 'web' ? 'web_url' : 'android_apk',
-        filterByStatus: 'completed', // Only show completed tests in history
-        search: searchQuery.trim() || undefined
-      };
+      if (!user?.id) return;
       
-      const response = await apiClient.getTestHistory(params);
+      let query = supabase
+        .from('tests')
+        .select('*', { count: 'exact' })
+        .eq('user_id', user.id)
+        .eq('status', 'completed')
+        .range(offset, offset + 9);
       
-      if (response.success && response.data) {
-        const tests = response.data;
-        
-        if (append) {
-          setTestHistory(prev => [...prev, ...tests]);
-        } else {
-          setTestHistory(tests);
-          setHistoryOffset(0);
-        }
-        
-        // Check if response has pagination info
-        if ('pagination' in response) {
-          setTotalHistoryCount(response.pagination.total);
-          setHasMoreHistory(response.pagination.hasMore);
-        } else {
-          setHasMoreHistory(tests.length === 10);
-        }
-      } else {
-        throw new Error(response.error || 'Failed to fetch test history');
+      // Apply search filter
+      if (searchQuery.trim()) {
+        query = query.ilike('test_name', `%${searchQuery.trim()}%`);
       }
+      
+      // Apply type filter
+      if (filterBy !== 'all') {
+        const typeFilter = filterBy === 'web' ? 'web_url' : 'android_apk';
+        query = query.eq('test_type', typeFilter);
+      }
+      
+      // Apply sorting
+      const ascending = sortBy === 'oldest';
+      query = query.order('submitted_at', { ascending });
+      
+      const { data: historyData, error: historyError, count } = await query;
+      
+      if (historyError) {
+        throw new Error(`Failed to fetch test history: ${historyError.message}`);
+      }
+      
+      const tests = historyData || [];
+      
+      if (append) {
+        setTestHistory(prev => [...prev, ...tests]);
+      } else {
+        setTestHistory(tests);
+        setHistoryOffset(0);
+      }
+      
+      setTotalHistoryCount(count || 0);
+      setHasMoreHistory(tests.length === 10 && offset + 10 < (count || 0));
+      
     } catch (error) {
       console.error('Error fetching test history:', error);
       setError(handleApiError(error instanceof Error ? error.message : 'Failed to fetch test history'));
@@ -437,7 +461,7 @@ function Upload() {
   };
 
   // Updated to handle new test types
-  const getTestTypeLabel = (test: TestHistoryItem | LiveTestItem) => {
+  const getTestTypeLabel = (test: Test) => {
     switch(test.test_type) {
       case 'web_url':
         return 'Web (URL)';

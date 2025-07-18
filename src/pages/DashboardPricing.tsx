@@ -74,10 +74,10 @@ function DashboardPricing() {
         setPaddleInitialized(true);
       }
       
-      // Wait a moment for Paddle to be ready
-      await new Promise(resolve => setTimeout(resolve, 200));
+      // Wait longer for Paddle to be ready
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
-      openPaddleCheckout({
+      const checkoutConfig = {
         items: [
           {
             priceId: priceId,
@@ -85,17 +85,24 @@ function DashboardPricing() {
           }
         ],
         customer: {
-          email: user.email || '',
-          id: profile.paddle_customer_id
+          email: user.email || ''
         },
         settings: {
-          displayMode: 'overlay',
-          theme: 'dark',
+          displayMode: 'overlay' as const,
+          theme: 'dark' as const,
           locale: 'en',
-          // FIXED: Added the required cancel_url
+          successUrl: `${window.location.origin}/dashboard/pricing?payment=success`,
           cancelUrl: `${window.location.origin}/dashboard/pricing?payment=cancelled`
         }
-      });
+      };
+      
+      // Only add customer ID if it exists
+      if (profile.paddle_customer_id) {
+        checkoutConfig.customer.id = profile.paddle_customer_id;
+      }
+      
+      console.log('Opening Paddle checkout with config:', checkoutConfig);
+      openPaddleCheckout(checkoutConfig);
       
     } catch (error) {
       console.error('Error opening Paddle checkout:', error);

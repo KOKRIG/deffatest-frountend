@@ -47,7 +47,7 @@ function Results() {
     if (!session?.access_token) return;
 
     const getWsUrl = () => {
-      const url = import.meta.env.VITE_API_BASE_URL || 'https://api.deffatest.com';
+      const url = import.meta.env.VITE_API_BASE_URL || 'https://api.deffatest.online';
       const protocol = url.startsWith('https') ? 'wss' : 'ws';
       const bareUrl = url.replace(/^https?:\/\//, '');
       return `${protocol}://${bareUrl}`;
@@ -130,9 +130,12 @@ function Results() {
       const currentOffset = loadMore ? offset : 0;
       const limit = 15;
 
+      if (!user?.id) return;
+      
       let query = supabase
         .from('tests')
         .select('*', { count: 'exact' })
+        .eq('user_id', user.id)
         .range(currentOffset, currentOffset + limit - 1);
 
       // Apply search filter
@@ -148,29 +151,29 @@ function Results() {
       // Apply type filter
       if (filters.filterByType !== 'all') {
         if (filters.filterByType === 'web_url') {
-          query = query.eq('test_type', 'web').not('app_url', 'is', null);
+          query = query.eq('test_type', 'web_url');
         } else if (filters.filterByType === 'web_bundle') {
-          query = query.eq('test_type', 'web').is('app_url', null);
+          query = query.eq('test_type', 'web_bundle');
         } else if (filters.filterByType === 'android_apk') {
-          query = query.eq('test_type', 'mobile');
+          query = query.eq('test_type', 'android_apk');
         }
       }
 
       // Apply date range filter
       if (filters.startDate) {
-        query = query.gte('created_at', filters.startDate);
+        query = query.gte('submitted_at', filters.startDate);
       }
       if (filters.endDate) {
-        query = query.lte('created_at', filters.endDate + 'T23:59:59');
+        query = query.lte('submitted_at', filters.endDate + 'T23:59:59');
       }
 
       // Apply sorting
       switch (filters.sortBy) {
         case 'newest':
-          query = query.order('created_at', { ascending: false });
+          query = query.order('submitted_at', { ascending: false });
           break;
         case 'oldest':
-          query = query.order('created_at', { ascending: true });
+          query = query.order('submitted_at', { ascending: true });
           break;
         case 'alphabetical_az':
           query = query.order('test_name', { ascending: true });
@@ -179,13 +182,13 @@ function Results() {
           query = query.order('test_name', { ascending: false });
           break;
         case 'duration_longest':
-          query = query.order('config->duration', { ascending: false });
+          query = query.order('requested_duration_minutes', { ascending: false });
           break;
         case 'duration_shortest':
-          query = query.order('config->duration', { ascending: true });
+          query = query.order('requested_duration_minutes', { ascending: true });
           break;
         default:
-          query = query.order('created_at', { ascending: false });
+          query = query.order('submitted_at', { ascending: false });
       }
 
       const { data, error, count } = await query;
