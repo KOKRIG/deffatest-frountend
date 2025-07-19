@@ -96,8 +96,8 @@ function DashboardPricing() {
         }
       };
       
-      // Only add customer ID if it exists
-      if (profile.paddle_customer_id) {
+      // Only add customer ID if it exists and is not empty
+      if (profile.paddle_customer_id && profile.paddle_customer_id.trim() !== '') {
         checkoutConfig.customer.id = profile.paddle_customer_id;
       }
       

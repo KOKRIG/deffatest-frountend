@@ -171,22 +171,56 @@ export const openPaddleCheckout = (options: PaddleCheckoutOptions): void => {
     }
 
     try {
-      // Ensure options.settings is an object, creating it if it doesn't exist
-      options.settings = options.settings || {}; 
+      // Ensure we have valid items
+      if (!options.items || options.items.length === 0) {
+        console.error('No items provided for checkout');
+        return;
+      }
 
-      // Remove seller from options if it exists in settings (as per your original code)
-      // This should be done AFTER ensuring options.settings is an object
-      const { seller, ...cleanSettings } = options.settings as any;
-      options.settings = cleanSettings;
+      // Validate price IDs
+      for (const item of options.items) {
+        if (!item.priceId || item.priceId.trim() === '') {
+          console.error('Invalid or empty price ID provided');
+          return;
+        }
+      }
 
-      // Set successUrl and cancelUrl
-      const frontendBaseUrl = window.location.origin; 
+      // Build clean checkout options
+      const checkoutOptions: any = {
+        items: options.items
+      };
 
-      options.settings.successUrl = `${frontendBaseUrl}/dashboard?payment=success`;
-      options.settings.cancelUrl = `${frontendBaseUrl}/dashboard?payment=cancelled`;
+      // Add customer data if available
+      if (options.customer && options.customer.email) {
+        checkoutOptions.customer = {
+          email: options.customer.email
+        };
+        
+        // Only add customer ID if it's a valid string
+        if (options.customer.id && options.customer.id.trim() !== '') {
+          checkoutOptions.customer.id = options.customer.id;
+        }
+      }
+
+      // Add settings if provided
+      if (options.settings) {
+        checkoutOptions.settings = {
+          displayMode: options.settings.displayMode || 'overlay',
+          theme: options.settings.theme || 'dark',
+          locale: options.settings.locale || 'en'
+        };
+        
+        // Add success and cancel URLs if provided
+        if (options.settings.successUrl) {
+          checkoutOptions.settings.successUrl = options.settings.successUrl;
+        }
+        if (options.settings.cancelUrl) {
+          checkoutOptions.settings.closeUrl = options.settings.cancelUrl;
+        }
+      }
       
-      console.log('Opening Paddle checkout with options:', options);
-      window.Paddle.Checkout.open(options);
+      console.log('Opening Paddle checkout with options:', checkoutOptions);
+      window.Paddle.Checkout.open(checkoutOptions);
       console.log('Paddle checkout opened successfully');
     } catch (error) {
       console.error('Error opening Paddle checkout:', error);

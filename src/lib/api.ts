@@ -342,6 +342,7 @@ export class ApiClient {
       ...options.headers,
     };
 
+    // Always add auth token if available, even if headers were overridden
     if (this.authToken) {
       headers.Authorization = `Bearer ${this.authToken}`;
     }
@@ -390,10 +391,16 @@ export class ApiClient {
       formData.append('file', request.file);
     }
 
+    // For FormData, we need to omit Content-Type but keep Authorization
+    const headers: HeadersInit = {};
+    if (this.authToken) {
+      headers.Authorization = `Bearer ${this.authToken}`;
+    }
+    
     return this.request(API_ENDPOINTS.tests.submit, {
       method: 'POST',
       body: formData,
-      headers: {}, // Remove Content-Type to let browser set it for FormData
+      headers, // Omit Content-Type to let browser set it for FormData
     });
   }
 
