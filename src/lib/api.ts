@@ -378,13 +378,14 @@ export class ApiClient {
   // Test Management Methods
   async submitTest(request: TestSubmissionRequest): Promise<ApiResponse<TestSubmissionResponse>> {
     const formData = new FormData();
-    formData.append('test_name', request.test_name); // Changed from testName
-    formData.append('test_type', request.test_type); // Changed from testType
-    formData.append('requested_duration_minutes', request.requested_duration_minutes.toString()); // Changed from duration
-    formData.append('plan_type_at_submission', request.plan_type_at_submission); // New field
+    // Match backend parameter names exactly
+    formData.append('name', request.test_name); // Backend expects 'name'
+    formData.append('test_type', request.test_type); // Matches backend
+    formData.append('duration', request.requested_duration_minutes.toString()); // Backend expects 'duration'
+    // Remove plan_type_at_submission as backend doesn't expect it
     
     if (request.test_source_url) {
-      formData.append('test_source_url', request.test_source_url); // Changed from url
+      formData.append('url', request.test_source_url); // Backend expects 'url'
     }
     
     if (request.file) {

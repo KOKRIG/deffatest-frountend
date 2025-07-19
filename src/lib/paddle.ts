@@ -124,17 +124,16 @@ function configurePaddle() {
   }
 
   try {
-    // Set environment to production first
-    if (window.Paddle.Environment && typeof window.Paddle.Environment.set === 'function') {
-      window.Paddle.Environment.set('production');
-    }
-    
     // Initialize with Paddle Billing v2 - using token only
     if (typeof window.Paddle.Initialize === 'function') {
       window.Paddle.Initialize({
         token: PADDLE_CONFIG.CLIENT_SIDE_TOKEN,
         eventCallback: (data: any) => {
           console.log('Paddle.js event:', data);
+          // Log checkout errors for debugging
+          if (data.name === 'checkout.error') {
+            console.error('Paddle checkout error:', data);
+          }
         }
       });
       
@@ -181,6 +180,11 @@ export const openPaddleCheckout = (options: PaddleCheckoutOptions): void => {
       for (const item of options.items) {
         if (!item.priceId || item.priceId.trim() === '') {
           console.error('Invalid or empty price ID provided');
+          return;
+        }
+        // Ensure price ID is in correct format
+        if (!item.priceId.startsWith('pri_')) {
+          console.error('Invalid price ID format. Price IDs should start with "pri_":', item.priceId);
           return;
         }
       }
