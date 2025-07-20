@@ -377,26 +377,28 @@ export class ApiClient {
   // Test Management Methods
   async submitTest(request: TestSubmissionRequest): Promise<ApiResponse<TestSubmissionResponse>> {
     const formData = new FormData();
+
+    // FIX: Use the exact names your FastAPI backend expects
     formData.append('name', request.test_name);
     formData.append('test_type', request.test_type);
     formData.append('duration', request.requested_duration_minutes.toString());
-    formData.append('plan_type_at_submission', request.plan_type_at_submission);
-    
+
+    // The 'url' field is optional, so only add it if it exists
     if (request.test_source_url) {
-      formData.append('url', request.test_source_url);
+        formData.append('url', request.test_source_url);
     }
     
+    // The 'file' field is optional, so only add it if it exists
     if (request.file) {
-      formData.append('file', request.file);
+        formData.append('file', request.file);
     }
 
     return this.request(API_ENDPOINTS.tests.submit, {
-      method: 'POST',
-      body: formData,
-      headers: {}, // Remove Content-Type to let browser set it for FormData
+        method: 'POST',
+        body: formData,
+        headers: {}, // Correct: Let browser set Content-Type for FormData
     });
-  }
-
+}
   async getTestHistory(params: TestHistoryRequest = {}): Promise<PaginatedResponse<TestHistoryItem>> {
     const searchParams = new URLSearchParams();
     
