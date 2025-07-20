@@ -1,6 +1,4 @@
 
-}
-
 // Test Submission Types - Updated to match new schema
 export interface TestSubmissionRequest {
   test_name: string; // Changed from testName
