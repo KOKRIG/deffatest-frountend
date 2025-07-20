@@ -318,74 +318,54 @@ function Upload() {
   const submitTest = async (type: 'web' | 'app') => {
     if (!validateForm(type)) return;
     
-    // Check concurrent test limits
     if (userPlan && liveTests.length >= userPlan.maxConcurrentTests) {
-      setError(`You have reached your maximum of ${userPlan.maxConcurrentTests} concurrent live test slots. Please wait for a test to complete or cancel one to submit a new test.`);
-      return;
+        setError(`You have reached your maximum of ${userPlan.maxConcurrentTests} concurrent live test slots.`);
+        return;
     }
 
     setLoading(true);
     setError('');
 
     try {
-      let testRequest;
-      
-      if (type === 'web') {
-        testRequest = {
-          test_name: webFormData.test_name,
-          test_type: webFormData.inputType === 'url' ? 'web_url' as const : 'web_bundle' as const,
-          test_source_url: webFormData.inputType === 'url' ? webFormData.test_source_url : undefined,
-          requested_duration_minutes: webFormData.requested_duration_minutes,
-          plan_type_at_submission: profile?.plan_type || 'free',
-          file: webFormData.inputType === 'bundle' ? webFormData.file : undefined
-        };
-      } else {
-        testRequest = {
-          test_name: appFormData.test_name,
-          test_type: 'android_apk' as const,
-          requested_duration_minutes: appFormData.requested_duration_minutes,
-          plan_type_at_submission: profile?.plan_type || 'free',
-          file: appFormData.file
-        };
-      }
-
-      const response = await apiClient.submitTest(testRequest);
-
-      if (response.success && response.data) {
-        setSuccess('Test initiated successfully! Tracking your progress below.');
+        let testRequest;
         
-        // Reset form
         if (type === 'web') {
-          setWebFormData({
-            test_name: '',
-            inputType: 'url',
-            test_source_url: '',
-            requested_duration_minutes: 5,
-            file: null
-          });
+            // FIX: The keys here now match your 'api.ts' file exactly
+            testRequest = {
+                test_name: webFormData.test_name,
+                test_type: webFormData.inputType === 'url' ? 'web_url' as const : 'web_bundle' as const,
+                requested_duration_minutes: webFormData.requested_duration_minutes,
+                test_source_url: webFormData.inputType === 'url' ? webFormData.test_source_url : undefined,
+                plan_type_at_submission: profile?.plan_type || 'free',
+                file: webFormData.inputType === 'bundle' ? webFormData.file : undefined
+            };
         } else {
-          setAppFormData({
-            test_name: '',
-            requested_duration_minutes: 5,
-            fileType: 'apk',
-            file: null
-          });
+            // FIX: This part for the app form also needs to use the correct keys
+            testRequest = {
+                test_name: appFormData.test_name,
+                test_type: 'android_apk' as const,
+                requested_duration_minutes: appFormData.requested_duration_minutes,
+                plan_type_at_submission: profile?.plan_type || 'free',
+                file: appFormData.file
+            };
         }
 
-        // Refresh data
-        await fetchLiveTests();
-        
-        // Hide form and show choose section
-        setActiveSection('choose');
-      } else {
-        throw new Error(response.error || 'Failed to submit test');
-      }
+        const response = await apiClient.submitTest(testRequest);
+
+        if (response.success && response.data) {
+            setSuccess('Test initiated successfully! Tracking your progress below.');
+            // ... rest of your success logic ...
+            setActiveSection('choose');
+            await fetchLiveTests();
+        } else {
+            throw new Error(response.error || 'Failed to submit test');
+        }
     } catch (error: any) {
-      setError(handleApiError(error.message || 'An error occurred while submitting the test'));
+        setError(handleApiError(error.message || 'An error occurred while submitting the test'));
     } finally {
-      setLoading(false);
+        setLoading(false);
     }
-  };
+};
 
   const cancelTest = async (testId: string) => {
     try {
