@@ -337,13 +337,20 @@ export class ApiClient {
     options: RequestInit = {}
   ): Promise<ApiResponse<T>> {
     const url = `${this.baseUrl}${endpoint}`;
-    const headers: HeadersInit = {
-      'Content-Type': 'application/json',
-      ...options.headers,
-    };
+    
+    // FIX: Start with the headers from the specific call (e.g., submitTest)
+    const headers = new Headers(options.headers);
 
     if (this.authToken) {
-      headers.Authorization = `Bearer ${this.authToken}`;
+      headers.set('Authorization', `Bearer ${this.authToken}`);
+    }
+
+    // FIX: ONLY set Content-Type if the body is NOT FormData.
+    // The browser will set the correct multipart header automatically for FormData.
+    if (!(options.body instanceof FormData)) {
+      if (!headers.has('Content-Type')) {
+        headers.set('Content-Type', 'application/json');
+      }
     }
 
     try {
@@ -352,13 +359,17 @@ export class ApiClient {
         headers,
       });
 
+      // Handle cases with no JSON body, like a 204 No Content response
+      if (response.status === 204) {
+        return { success: true };
+      }
+
       const data = await response.json();
 
       if (!response.ok) {
-        return {
-          success: false,
-          error: data.error || `HTTP ${response.status}: ${response.statusText}`,
-        };
+        // Use the detailed error message from FastAPI if available
+        const errorMessage = data.detail?.[0]?.msg || data.detail || data.error || `HTTP ${response.status}`;
+        return { success: false, error: errorMessage };
       }
 
       return {
@@ -378,27 +389,27 @@ export class ApiClient {
   async submitTest(request: TestSubmissionRequest): Promise<ApiResponse<TestSubmissionResponse>> {
     const formData = new FormData();
 
-    // FIX: Use the exact names your FastAPI backend expects
+    // Use the correct backend field names
     formData.append('name', request.test_name);
     formData.append('test_type', request.test_type);
     formData.append('duration', request.requested_duration_minutes.toString());
-
-    // The 'url' field is optional, so only add it if it exists
+    
     if (request.test_source_url) {
-        formData.append('url', request.test_source_url);
+      formData.append('url', request.test_source_url);
     }
     
-    // The 'file' field is optional, so only add it if it exists
     if (request.file) {
-        formData.append('file', request.file);
+      formData.append('file', request.file);
     }
 
+    // FIX: The headers object is no longer needed here because the generic
+    // request function now handles it correctly.
     return this.request(API_ENDPOINTS.tests.submit, {
-        method: 'POST',
-        body: formData,
-        headers: {}, // Correct: Let browser set Content-Type for FormData
+      method: 'POST',
+      body: formData,
     });
-}
+  }
+
   async getTestHistory(params: TestHistoryRequest = {}): Promise<PaginatedResponse<TestHistoryItem>> {
     const searchParams = new URLSearchParams();
     
