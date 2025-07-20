@@ -1,4 +1,132 @@
+// API Endpoints Configuration for DEFFATEST
+// This file contains all the API endpoint definitions and helper functions
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.deffatest.online';
+
+// API Endpoints
+export const API_ENDPOINTS = {
+  // Authentication & User Management
+  auth: {
+    login: '/auth/login',
+    register: '/auth/register',
+    logout: '/auth/logout',
+    refresh: '/auth/refresh',
+    resetPassword: '/auth/reset-password',
+    updatePassword: '/auth/update-password'
+  },
+
+  // User Profile & Plan Management
+  user: {
+    profile: '/api/user/profile',
+    plan: '/api/user/plan',
+    updateProfile: '/api/user/profile',
+    subscription: '/api/user/subscription',
+    paddlePortalLink: '/api/user/paddle-portal-link'
+  },
+
+  // Test Management
+  tests: {
+    submit: '/api/tests/submit',
+    list: '/api/tests',
+    history: '/api/tests/history',
+    live: '/api/tests/live',
+    summary: '/api/tests/summary',
+    recent: '/api/tests/recent',
+    details: (testId: string) => `/api/tests/${testId}`,
+    cancel: (testId: string) => `/api/tests/${testId}`,
+    results: (testId: string) => `/api/tests/${testId}/results`,
+    status: (testId: string) => `/api/tests/${testId}/status`,
+    report: (testId: string) => `/api/tests/${testId}/report`
+  },
+
+  // Bug Reports
+  bugs: {
+    list: (testId: string) => `/api/tests/${testId}/bugs`,
+    details: (bugId: string) => `/api/bugs/${bugId}`,
+    create: '/api/bugs',
+    update: (bugId: string) => `/api/bugs/${bugId}`
+  },
+
+  // File Upload
+  upload: {
+    file: '/api/upload/file',
+    bundle: '/api/upload/bundle',
+    apk: '/api/upload/apk'
+  },
+
+  // Analytics & Reporting
+  analytics: {
+    dashboard: '/api/analytics/dashboard',
+    testMetrics: '/api/analytics/test-metrics',
+    bugTrends: '/api/analytics/bug-trends',
+    performance: '/api/analytics/performance'
+  },
+
+  // Payment & Billing
+  payment: {
+    plans: '/api/payment/plans',
+    subscribe: '/api/payment/subscribe',
+    changePlan: '/api/payment/change-plan',
+    cancel: '/api/payment/cancel',
+    invoices: '/api/payment/invoices',
+    updatePayment: '/api/payment/update-method'
+  },
+
+  // API Key Management (For Chaos Mode) - Updated to match frontend prompt
+  apiKeys: {
+    list: '/api/v1/api-keys',
+    create: '/api/v1/api-keys',
+    generate: '/api/v1/api-keys/generate',
+    revoke: (keyId: string) => `/api/v1/api-keys/revoke/${keyId}`,
+    regenerate: '/api/v1/api-keys/regenerate',
+    status: (keyId: string) => `/api/v1/api-keys/${keyId}/status`
+  },
+
+  // Webhooks
+  webhooks: {
+    list: '/api/webhooks',
+    create: '/api/webhooks',
+    update: (webhookId: string) => `/api/webhooks/${webhookId}`,
+    delete: (webhookId: string) => `/api/webhooks/${webhookId}`,
+    test: (webhookId: string) => `/api/webhooks/${webhookId}/test`
+  },
+
+  // Integration
+  integrations: {
+    github: '/api/integrations/github',
+    gitlab: '/api/integrations/gitlab',
+    jenkins: '/api/integrations/jenkins',
+    slack: '/api/integrations/slack'
+  },
+
+  // System & Health
+  system: {
+    health: '/api/health',
+    status: '/api/status',
+    version: '/api/version'
+  },
+  
+  // Paddle Webhook
+  paddle: {
+    webhook: '/paddle/webhook'
+  }
+};
+
+// API Response Types
+export interface ApiResponse<T = any> {
+  success: boolean;
+  data?: T;
+  error?: string;
+  message?: string;
+}
+
+export interface PaginatedResponse<T = any> extends ApiResponse<T[]> {
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    hasMore: boolean;
+  };
 }
 
 // Test Submission Types - Updated to match new schema
@@ -214,7 +342,6 @@ export class ApiClient {
       ...options.headers,
     };
 
-    // Always add auth token if available, even if headers were overridden
     if (this.authToken) {
       headers.Authorization = `Bearer ${this.authToken}`;
     }
@@ -250,30 +377,23 @@ export class ApiClient {
   // Test Management Methods
   async submitTest(request: TestSubmissionRequest): Promise<ApiResponse<TestSubmissionResponse>> {
     const formData = new FormData();
-    // Match backend parameter names exactly
-    formData.append('test_name', request.test_name); // Backend expects 'test_name'
-    formData.append('test_type', request.test_type); // Matches backend
-    formData.append('requested_duration_minutes', request.requested_duration_minutes.toString()); // Backend expects 'requested_duration_minutes'
-    formData.append('plan_type_at_submission', request.plan_type_at_submission); // Add plan type
+    formData.append('test_name', request.test_name); // Changed from testName
+    formData.append('test_type', request.test_type); // Changed from testType
+    formData.append('requested_duration_minutes', request.requested_duration_minutes.toString()); // Changed from duration
+    formData.append('plan_type_at_submission', request.plan_type_at_submission); // New field
     
     if (request.test_source_url) {
-      formData.append('test_source_url', request.test_source_url); // Backend expects 'test_source_url'
+      formData.append('test_source_url', request.test_source_url); // Changed from url
     }
     
     if (request.file) {
-      formData.append('uploaded_file', request.file); // Backend expects 'uploaded_file'
+      formData.append('file', request.file);
     }
 
-    // For FormData, we need to omit Content-Type but keep Authorization
-    const headers: HeadersInit = {};
-    if (this.authToken) {
-      headers.Authorization = `Bearer ${this.authToken}`;
-    }
-    
     return this.request(API_ENDPOINTS.tests.submit, {
       method: 'POST',
       body: formData,
-      headers, // Omit Content-Type to let browser set it for FormData
+      headers: {}, // Remove Content-Type to let browser set it for FormData
     });
   }
 
@@ -324,22 +444,40 @@ export class ApiClient {
     return this.request(API_ENDPOINTS.user.profile);
   }
 
-  async updateUserProfile(data: UserProfileUpdateRequest): Promise<ApiResponse<any>> {
+  async updateUserProfile(data: UserProfileUpdateRequest): Promise<ApiResponse<void>> {
     return this.request(API_ENDPOINTS.user.updateProfile, {
       method: 'PUT',
       body: JSON.stringify(data),
     });
   }
 
-  // API Key Methods
-  async listApiKeys(): Promise<ApiResponse<ApiKeyResponse[]>> {
+  async updatePlan(plan_type: 'free' | 'pro' | 'chaos'): Promise<ApiResponse<void>> {
+    return this.request(API_ENDPOINTS.user.updateProfile, {
+      method: 'PUT',
+      body: JSON.stringify({ plan_type }), // Changed from subscription_plan
+    });
+  }
+
+  async getPaddlePortalLink(): Promise<ApiResponse<{ url: string }>> {
+    return this.request(API_ENDPOINTS.user.paddlePortalLink);
+  }
+
+  async getDashboardSummary(): Promise<ApiResponse<DashboardSummaryResponse>> {
+    return this.request(API_ENDPOINTS.tests.summary);
+  }
+
+  async getRecentTests(limit: number = 5): Promise<ApiResponse<TestHistoryItem[]>> {
+    return this.request(`${API_ENDPOINTS.tests.recent}?limit=${limit}`);
+  }
+
+  // API Key Methods (For Chaos Mode)
+  async getApiKeys(): Promise<ApiResponse<ApiKeyResponse[]>> {
     return this.request(API_ENDPOINTS.apiKeys.list);
   }
 
-  async generateApiKey(name: string): Promise<ApiResponse<ApiKeyGenerateResponse>> {
+  async generateApiKey(): Promise<ApiResponse<ApiKeyGenerateResponse>> {
     return this.request(API_ENDPOINTS.apiKeys.generate, {
       method: 'POST',
-      body: JSON.stringify({ name }),
     });
   }
 
@@ -348,14 +486,65 @@ export class ApiClient {
       method: 'DELETE',
     });
   }
+
+  async updateApiKeyStatus(keyId: string, isActive: boolean): Promise<ApiResponse<void>> {
+    return this.request(API_ENDPOINTS.apiKeys.status(keyId), {
+      method: 'PUT',
+      body: JSON.stringify({ is_active: isActive }),
+    });
+  }
+
+  // Payment Methods
+  async changePlan(plan_type: 'free' | 'pro' | 'chaos'): Promise<ApiResponse<void>> {
+    return this.request(API_ENDPOINTS.payment.changePlan, {
+      method: 'POST',
+      body: JSON.stringify({ plan_type }), // Changed from plan_type
+    });
+  }
 }
 
+// Default API client instance
 export const apiClient = new ApiClient();
 
-// Error Handling Helper
-export const handleApiError = (error: any): string => {
-  if (typeof error === 'string') return error;
-  if (error && error.message) return error.message;
-  return 'An unknown error occurred';
+// Error handling utilities
+export const handleApiError = (error: string): string => {
+  // Map common API errors to user-friendly messages
+  const errorMappings: Record<string, string> = {
+    'UNAUTHORIZED': 'Please log in to continue',
+    'FORBIDDEN': 'You do not have permission to perform this action',
+    'NOT_FOUND': 'The requested resource was not found',
+    'RATE_LIMITED': 'Too many requests. Please try again later',
+    'PLAN_LIMIT_EXCEEDED': 'You have reached your plan limit. Please upgrade to continue',
+    'CONCURRENT_LIMIT_EXCEEDED': 'You have reached your concurrent test limit',
+    'INVALID_FILE_TYPE': 'Invalid file type. Please check the file format',
+    'FILE_TOO_LARGE': 'File size exceeds the maximum limit',
+    'NETWORK_ERROR': 'Network error. Please check your connection and try again',
+    'PLAN_RESTRICTION': 'This feature is not available on your current plan',
+    'PAYMENT_REQUIRED': 'Payment is required to access this feature',
+    'INVALID_DURATION': 'Selected duration not available for your plan',
+    'SLOT_LIMIT_REACHED': 'Maximum concurrent test slots reached for your plan'
+  };
+
+  return errorMappings[error] || error || 'An unexpected error occurred';
 };
 
+// Request interceptors for authentication
+export const setupApiInterceptors = (getAuthToken: () => string | null) => {
+  const originalFetch = window.fetch;
+  
+  window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
+    const token = getAuthToken();
+    
+    if (token && init?.headers) {
+      const headers = new Headers(init.headers);
+      headers.set('Authorization', `Bearer ${token}`);
+      init.headers = headers;
+    }
+    
+    return originalFetch(input, init);
+  };
+};
+
+// Paddle integration removed from api.ts - use paddle.ts instead
+
+export default apiClient;
