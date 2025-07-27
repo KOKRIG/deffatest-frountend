@@ -6,7 +6,9 @@ import DashboardHeader from '../components/dashboard/DashboardHeader';
 import PlanUsage from '../components/dashboard/PlanUsage';
 import RecentTests from '../components/dashboard/RecentTests';
 import { supabase, Test } from '../lib/supabase';
-import { Rocket, Clock, Zap, Bug, TrendingUp, Eye, ArrowRight, Activity } from 'lucide-react';
+import { initializePaddle } from '../lib/paddle';
+import { preFetchDashboardData } from '../lib/api';
+import { Rocket, Clock, Zap, Bug, TrendingUp, Eye, ArrowRight, Activity, Globe, Smartphone, CheckCircle, Play, XCircle, RefreshCw, AlertTriangle } from 'lucide-react';
 
 function Dashboard() {
   const { user, profile } = useAuth();
@@ -22,6 +24,8 @@ function Dashboard() {
       return;
     }
     fetchDashboardData();
+    initializePaddle();
+    preFetchDashboardData();
   }, [user, navigate]);
 
   const fetchDashboardData = async () => {

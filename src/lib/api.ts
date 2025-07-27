@@ -1,6 +1,20 @@
 // API Endpoints Configuration for DEFFATEST
 // This file contains all the API endpoint definitions and helper functions
+import { supabase } from './supabase';
 
+// Pre-fetch data for faster navigation
+export const preFetchDashboardData = async () => {
+  try {
+    // Pre-fetch data for Upload page
+    await supabase.from('tests').select('*').in('status', ['queued', 'running', 'processing_results']).limit(10);
+    await supabase.from('tests').select('*', { count: 'exact' }).eq('status', 'completed').limit(10);
+
+    // Pre-fetch data for Results page
+    await supabase.from('tests').select('*', { count: 'exact' }).limit(15);
+  } catch (error) {
+    console.warn('Pre-fetching failed, but this is not critical:', error);
+  }
+};
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.deffatest.online';
 
 // API Endpoints
@@ -337,14 +351,20 @@ export class ApiClient {
     options: RequestInit = {}
   ): Promise<ApiResponse<T>> {
     const url = `${this.baseUrl}${endpoint}`;
-    const headers: HeadersInit = {
-      'Content-Type': 'application/json',
-      ...options.headers,
-    };
+    
+    // FIX: Start with the headers from the specific call (e.g., submitTest)
+    const headers = new Headers(options.headers);
 
-    // Always add auth token if available, even if headers were overridden
     if (this.authToken) {
-      headers.Authorization = `Bearer ${this.authToken}`;
+      headers.set('Authorization', `Bearer ${this.authToken}`);
+    }
+
+    // FIX: ONLY set Content-Type if the body is NOT FormData.
+    // The browser will set the correct multipart header automatically for FormData.
+    if (!(options.body instanceof FormData)) {
+      if (!headers.has('Content-Type')) {
+        headers.set('Content-Type', 'application/json');
+      }
     }
 
     try {
@@ -353,13 +373,17 @@ export class ApiClient {
         headers,
       });
 
+      // Handle cases with no JSON body, like a 204 No Content response
+      if (response.status === 204) {
+        return { success: true };
+      }
+
       const data = await response.json();
 
       if (!response.ok) {
-        return {
-          success: false,
-          error: data.error || `HTTP ${response.status}: ${response.statusText}`,
-        };
+        // Use the detailed error message from FastAPI if available
+        const errorMessage = data.detail?.[0]?.msg || data.detail || data.error || `HTTP ${response.status}`;
+        return { success: false, error: errorMessage };
       }
 
       return {
@@ -378,30 +402,27 @@ export class ApiClient {
   // Test Management Methods
   async submitTest(request: TestSubmissionRequest): Promise<ApiResponse<TestSubmissionResponse>> {
     const formData = new FormData();
-    // Match backend parameter names exactly
-    formData.append('name', request.test_name); // Backend expects 'name'
-    formData.append('test_type', request.test_type); // Matches backend
-    formData.append('duration', request.requested_duration_minutes.toString()); // Backend expects 'duration'
-    // Remove plan_type_at_submission as backend doesn't expect it
+
+    // Use the correct backend field names that match what the backend expects
+    formData.append('test_name', request.test_name);
+    formData.append('test_type', request.test_type);
+    formData.append('requested_duration_minutes', request.requested_duration_minutes.toString());
+    formData.append('plan_type_at_submission', request.plan_type_at_submission);
     
     if (request.test_source_url) {
-      formData.append('url', request.test_source_url); // Backend expects 'url'
+      formData.append('test_source_url', request.test_source_url);
     }
     
     if (request.file) {
-      formData.append('file', request.file);
+      // Backend expects the file under 'uploaded_file' key, not 'file'
+      formData.append('uploaded_file', request.file);
     }
 
-    // For FormData, we need to omit Content-Type but keep Authorization
-    const headers: HeadersInit = {};
-    if (this.authToken) {
-      headers.Authorization = `Bearer ${this.authToken}`;
-    }
-    
+    // FIX: The headers object is no longer needed here because the generic
+    // request function now handles it correctly.
     return this.request(API_ENDPOINTS.tests.submit, {
       method: 'POST',
       body: formData,
-      headers, // Omit Content-Type to let browser set it for FormData
     });
   }
 

@@ -21,11 +21,9 @@ import Results from './pages/Results.tsx';
 import TestReport from './pages/TestReport.tsx';
 import Settings from './pages/Settings.tsx';
 import DashboardPricing from './pages/DashboardPricing.tsx';
-import BoltBadge from './pages/BoltBadge.tsx';
 import LogoPage from './pages/LogoPage.tsx';
 import ScrollToTop from './components/ScrollToTop.tsx';
 import ProtectedRoute from './components/ProtectedRoute.tsx';
-import BoltBadgeComponent from './components/BoltBadge.tsx';
 import LoadingScreen from './components/LoadingScreen.tsx';
 import { AuthProvider } from './contexts/AuthContext.tsx';
 import { initializePaddle } from './lib/paddle.ts';
@@ -98,24 +96,23 @@ preloadLogo().finally(() => {
           <LoadingScreen />
           <ScrollToTop />
           <Routes>
-            <Route path="/" element={<App />} />
-            <Route path="/use-cases" element={<UseCases />} />
-            <Route path="/features" element={<Features />} />
-            <Route path="/how-it-works" element={<HowItWorks />} />
-            <Route path="/pricing" element={<Pricing />} />
-            <Route path="/docs" element={<Documentation />} />
-            <Route path="/privacy" element={<PrivacyPolicy />} />
-            <Route path="/cookie-policy" element={<CookiePolicy />} />
-            <Route path="/contact-us" element={<ContactUs />} />
-            <Route path="/terms" element={<Terms />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route path="/reset-password" element={<ResetPassword />} />
-            <Route path="/update-password" element={<UpdatePassword />} />
-            <Route path="/bolt-badge" element={<BoltBadge />} />
-            <Route path="/logo" element={<LogoPage />} />
+            <Route path=\"/\" element={<App />} />
+            <Route path=\"/use-cases\" element={<UseCases />} />
+            <Route path=\"/features\" element={<Features />} />
+            <Route path=\"/how-it-works\" element={<HowItWorks />} />
+            <Route path=\"/pricing\" element={<Pricing />} />
+            <Route path=\"/docs\" element={<Documentation />} />
+            <Route path=\"/privacy\" element={<PrivacyPolicy />} />
+            <Route path=\"/cookie-policy\" element={<CookiePolicy />} />
+            <Route path=\"/contact-us\" element={<ContactUs />} />
+            <Route path=\"/terms\" element={<Terms />} />
+            <Route path=\"/login\" element={<Login />} />
+            <Route path=\"/signup\" element={<Signup />} />
+            <Route path=\"/reset-password\" element={<ResetPassword />} />
+            <Route path=\"/update-password\" element={<UpdatePassword />} />
+            <Route path=\"/logo\" element={<LogoPage />} />
             <Route 
-              path="/dashboard" 
+              path=\"/dashboard\" 
               element={
                 <ProtectedRoute>
                   <Dashboard />
@@ -123,7 +120,7 @@ preloadLogo().finally(() => {
               } 
             />
             <Route 
-              path="/dashboard/pricing" 
+              path=\"/dashboard/pricing\" 
               element={
                 <ProtectedRoute>
                   <DashboardPricing />
@@ -131,7 +128,7 @@ preloadLogo().finally(() => {
               } 
             />
             <Route 
-              path="/upload" 
+              path=\"/upload\" 
               element={
                 <ProtectedRoute>
                   <Upload />
@@ -139,7 +136,7 @@ preloadLogo().finally(() => {
               } 
             />
             <Route 
-              path="/results" 
+              path=\"/results\" 
               element={
                 <ProtectedRoute>
                   <Results />
@@ -147,7 +144,7 @@ preloadLogo().finally(() => {
               } 
             />
             <Route 
-              path="/results/:testId" 
+              path=\"/results/:testId\" 
               element={
                 <ProtectedRoute>
                   <TestReport />
@@ -155,7 +152,7 @@ preloadLogo().finally(() => {
               } 
             />
             <Route 
-              path="/settings" 
+              path=\"/settings\" 
               element={
                 <ProtectedRoute>
                   <Settings />
@@ -163,9 +160,6 @@ preloadLogo().finally(() => {
               } 
             />
           </Routes>
-          
-          {/* Global Bolt Badge - appears on every page */}
-          <BoltBadgeComponent />
         </AuthProvider>
       </BrowserRouter>
     </StrictMode>
