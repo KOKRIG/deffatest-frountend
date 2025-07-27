@@ -1092,7 +1092,7 @@ function Upload() {
               <AlertTriangle className="w-20 h-20 text-red-400 mx-auto mb-6" />
               <h2 className="text-3xl font-bold text-red-400 mb-6">Confirm Test Cancellation</h2>
               <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-6 mb-8">
-                  <p className=\"text-red-300 text-lg leading-relaxed font-semibold\">
+                  <p className="text-red-300 text-lg leading-relaxed font-semibold">
                     <strong>WARNING:</strong> If this test is cancelled, the system will NOT provide any result file or any test report. 
                     It will immediately terminate the current session and permanently delete ALL files related 
                     to this test from the system. All progress will be irreversibly terminated and unrecoverable. 
