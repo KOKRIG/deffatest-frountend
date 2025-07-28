@@ -1,0 +1,57 @@
+{
+    "title": "Find the Perfect Plan",
+    "subtitle": "Scale your testing efforts with a plan that fits your needs.",
+    "plans": [
+        {
+            "name": "Free",
+            "price": "$0",
+            "period": "/month",
+            "features": ["1 test per month", "5 min max duration", "Standard queue"],
+            "isMostPopular": false,
+            "button": { "text": "Your Current Plan", "url": "#" },
+            "theme": { "borderColor": "#4B5563" }
+        },
+        {
+            "name": "Pro",
+            "price": "$110",
+            "period": "/month",
+            "features": ["25 tests per month", "2 hours max duration", "Priority queue", "4 concurrent slots"],
+            "isMostPopular": true,
+            "button": { "text": "Upgrade to Pro", "url": "#" },
+            "theme": { "borderColor": "#3B82F6", "gradientFrom": "#3B82F6", "gradientTo": "#8B5CF6" }
+        },
+        {
+            "name": "Chaos",
+            "price": "$350",
+            "period": "/month",
+            "features": ["Unlimited tests", "6 hours max duration", "Instant queue", "8 concurrent slots", "API access"],
+            "isMostPopular": false,
+            "button": { "text": "Upgrade to Chaos", "url": "#" },
+            "theme": { "borderColor": "#8B5CF6", "gradientFrom": "#8B5CF6", "gradientTo": "#EC4899" }
+        }
+    ],
+    "comparisonSection": {
+        "title": "Full Plan Comparison",
+        "tableHeaders": ["Feature", "Free", "Pro", "Chaos"],
+        "rows": [
+            { "feature": "Monthly Tests", "free": "1", "pro": "25", "chaos": "Unlimited" },
+            { "feature": "Max Test Duration", "free": "5 min", "pro": "2 hours", "chaos": "6 hours" },
+            { "feature": "Concurrent Slots", "free": "1", "pro": "4", "chaos": "8" },
+            { "feature": "API Access", "free": "No", "pro": "No", "chaos": "Yes" }
+        ]
+    },
+    "faqSection": {
+        "title": "Frequently Asked Questions",
+        "faqs": [
+            {
+                "question": "How do I upgrade my plan?",
+                "answer": "Simply click the upgrade button on the plan you want and follow the checkout process."
+            },
+            {
+                "question": "Can I cancel anytime?",
+                "answer": "Yes, you can cancel your subscription at any time. Your plan will remain active until the end of your current billing period."
+            }
+        ]
+    }
+}
+

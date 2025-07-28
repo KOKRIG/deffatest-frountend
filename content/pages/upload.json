@@ -1,0 +1,10 @@
+{
+    "title": "Start Your AI-Powered Test",
+    "webOptionTitle": "Test a Web Application",
+    "webOptionDescription": "Provide a URL or upload a code bundle.",
+    "appOptionTitle": "Test an Android App",
+    "appOptionDescription": "Upload your APK file to begin testing.",
+    "slotsFullTitle": "All Test Slots Are Currently in Use",
+    "slotsFullMessage": "Please wait for a test to complete before starting a new one. You can view your live tests on the dashboard."
+}
+

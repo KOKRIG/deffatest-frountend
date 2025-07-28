@@ -1,0 +1,39 @@
+{
+    "pageTitle": "DEFFATEST Dashboard",
+    "header": {
+        "greeting": "Welcome Back,"
+    },
+    "planUsageSection": {
+        "title": "Your Current Plan"
+    },
+    "quickActionsSection": {
+        "title": "Quick Actions",
+        "actions": [
+            {
+                "text": "Start New Test",
+                "url": "/upload",
+                "icon": "Rocket",
+                "theme": { "gradientFrom": "#8B5CF6", "gradientTo": "#EC4899" }
+            },
+            {
+                "text": "View Results",
+                "url": "/results",
+                "icon": "Eye",
+                "theme": { "gradientFrom": "#22D3EE", "gradientTo": "#3B82F6" }
+            },
+            {
+                "text": "Manage Plan",
+                "url": "/dashboard/pricing",
+                "icon": "TrendingUp",
+                "theme": { "gradientFrom": "#10B981", "gradientTo": "#14B8A6" }
+            },
+            {
+                "text": "Settings",
+                "url": "/settings",
+                "icon": "Activity",
+                "theme": { "gradientFrom": "#F97316", "gradientTo": "#EF4444" }
+            }
+        ]
+    }
+}
+
