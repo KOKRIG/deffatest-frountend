@@ -1,0 +1,12 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  SECRETS_SCAN_OMIT_KEYS = "VITE_PADDLE_CLIENT_TOKEN,VITE_SUPABASE_ANON_KEY,VITE_SUPABASE_URL,VITE_API_BASE_URL"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
