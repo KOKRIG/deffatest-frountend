@@ -15,7 +15,7 @@ export const preFetchDashboardData = async () => {
     console.warn('Pre-fetching failed, but this is not critical:', error);
   }
 };
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.deffatest.online';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 // API Endpoints
 export const API_ENDPOINTS = {

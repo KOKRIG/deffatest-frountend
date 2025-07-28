@@ -1,8 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
 
 // Use environment variables with fallback for development
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://njtxcvonqdpsmjsczbbd.supabase.co';
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5qdHhjdm9ucWRwc21qc2N6YmJkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA5MzA2ODUsImV4cCI6MjA2NjUwNjY4NX0.SprNvNa-_A3-2AoWPdJqPsMPB7G2pjrVTbEPgGJxePY';
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL!;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY!;
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
