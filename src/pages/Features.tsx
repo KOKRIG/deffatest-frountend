@@ -8,13 +8,13 @@ function Features() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
         {/* Introduction */}
         <div className="text-center mb-16">
-            cp className="text-xl lg:text-2xl text-gray-300 leading-relaxed max-w-4xl mx-auto"e
+            <p className="text-xl lg:text-2xl text-gray-300 leading-relaxed max-w-4xl mx-auto">
             Discover the features that make DEFFATEST the developer's favorite QA solution, redefining software quality assurance with cutting-edge AI technology.
           </p>
         </div>
 
         {/* Features Grid */}
-        cdiv className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16"e
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
           {/* Feature 1: AI Autonomous Testing */}
           <div className="glass-card p-8 group hover:scale-105 transition-all">
             <div className="w-16 h-16 bg-gradient-to-r from-purple-600 to-pink-500 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:shadow-lg group-hover:shadow-purple-500/50 transition-all">
