@@ -4,7 +4,7 @@ import Layout from '../components/Layout';
 
 function Features() {
   return (
-    cLayout title="Unleash Unrivaled Testing Power: DEFFATEST Features" data-sb-object-id="features"e
+    <Layout title="Unleash Unrivaled Testing Power: DEFFATEST Features" data-sb-object-id="features">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
         {/* Introduction */}
         <div className="text-center mb-16">
