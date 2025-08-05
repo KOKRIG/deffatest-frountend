@@ -47,10 +47,10 @@ function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white relative overflow-x-hidden">
+    <div className="min-h-screen bg-black text-white relative overflow-x-hidden" data-sb-object-id="login">
       {/* Animated Background Overlay */}
-      <div className="fixed inset-0 z-0 pointer-events-none">
-        <div className="absolute inset-0 animated-grid-overlay"></div>
+      <div className="fixed inset-0 z-0 pointer-events-none" data-sb-field-path="background">
+        <div className="absolute inset-0 animated-grid-overlay" data-sb-field-path="background.overlay"></div>
       </div>
 
       {/* Main Content */}
@@ -62,10 +62,10 @@ function Login() {
               <Link to="/" className="inline-block mb-6">
                 <Logo size="large" />
               </Link>
-              <h1 className="font-orbitron font-bold text-3xl mb-2 text-white">
+              <h1 className="font-orbitron font-bold text-3xl mb-2 text-white" data-sb-field-path="heading">
                 Welcome Back
               </h1>
-              <p className="text-gray-400">Sign in to your DEFFATEST account</p>
+              <p className="text-gray-400" data-sb-field-path="subheading">Sign in to your DEFFATEST account</p>
             </div>
 
             {/* Success Message */}
@@ -91,7 +91,7 @@ function Login() {
             {/* Login Form */}
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
+                <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2" data-sb-field-path="emailLabel">
                   Email Address
                 </label>
                 <div className="relative">
@@ -110,7 +110,7 @@ function Login() {
               </div>
 
               <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-2">
+                <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-2" data-sb-field-path="passwordLabel">
                   Password
                 </label>
                 <div className="relative">
@@ -146,7 +146,7 @@ function Login() {
                     Signing In...
                   </div>
                 ) : (
-                  'Sign In'
+                  <span data-sb-field-path="submitButtonText">Sign In</span>
                 )}
               </button>
             </form>
@@ -158,15 +158,15 @@ function Login() {
                   to="/reset-password" 
                   className="text-cyan-400 hover:text-cyan-300 transition-colors text-sm font-medium"
                 >
-                  Forgot your password?
+                  <span data-sb-field-path="forgotPasswordText">Forgot your password?</span>
                 </Link>
               </div>
               
               <div className="text-center">
                 <p className="text-sm text-gray-400">
-                  Don't have an account?{' '}
+                  <span data-sb-field-path="noAccountText">Don't have an account?</span>{' '}
                   <Link to="/signup" className="text-cyan-400 hover:text-cyan-300 transition-colors font-medium">
-                    Sign up for free
+                    <span data-sb-field-path="signupLinkText">Sign up for free</span>
                   </Link>
                 </p>
               </div>

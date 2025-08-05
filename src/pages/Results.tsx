@@ -391,10 +391,10 @@ function Results() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white relative overflow-x-hidden">
+    <div className="min-h-screen bg-black text-white relative overflow-x-hidden" data-sb-object-id="results">
       {/* Animated Background Overlay */}
-      <div className="fixed inset-0 z-0 pointer-events-none">
-        <div className="absolute inset-0 animated-grid-overlay opacity-30"></div>
+      <div className="fixed inset-0 z-0 pointer-events-none" data-sb-field-path="background">
+        <div className="absolute inset-0 animated-grid-overlay opacity-30" data-sb-field-path="background.overlay"></div>
       </div>
 
       {/* Navigation Bar */}
@@ -473,9 +473,9 @@ function Results() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Page Header */}
           <div className="mb-8">
-            <h1 className="font-orbitron font-bold text-4xl lg:text-5xl mb-4 bg-gradient-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent">
-              Your Test Results
-            </h1>
+          <h1 className="font-orbitron font-bold text-4xl lg:text-5xl text-center bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500 bg-clip-text text-transparent mb-12" data-sb-field-path="pageHeading">
+            Test Results
+          </h1>
             <p className="text-xl text-gray-300">
               Browse and analyze all your testing efforts. Total tests: {totalCount}
             </p>

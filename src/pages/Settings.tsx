@@ -352,13 +352,13 @@ function Settings() {
 
   return (
     <DashboardLayout currentPage="settings">
-      <div className="max-w-7xl mx-auto space-y-8">
+      <div className="max-w-7xl mx-auto space-y-8" data-sb-object-id="settings">
         {/* Page Header */}
         <div className="mb-8">
-          <h1 className="font-orbitron font-bold text-4xl lg:text-5xl mb-4 bg-gradient-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent">
+          <h1 className="font-orbitron font-bold text-4xl lg:text-5xl mb-4 bg-gradient-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent" data-sb-field-path="pageHeading">
             Settings
           </h1>
-          <p className="text-xl text-gray-300">
+          <p className="text-xl text-gray-300" data-sb-field-path="pageSubheading">
             Manage your account, billing, and preferences
           </p>
         </div>
@@ -440,10 +440,10 @@ function Settings() {
             {/* Profile Section */}
             {activeSection === 'profile' && (
               <div className="glass-card p-8">
-                <h2 className="text-2xl font-bold text-cyan-400 mb-6">Profile Information</h2>
+                <h2 className="text-2xl font-bold text-cyan-400 mb-6" data-sb-field-path="profileHeading">Profile Information</h2>
                 <div className="space-y-6">
                   <div>
-                    <label htmlFor="fullName" className="block text-sm font-medium text-gray-300 mb-2">
+                    <label htmlFor="fullName" className="block text-sm font-medium text-gray-300 mb-2" data-sb-field-path="fullNameLabel">
                       Full Name
                     </label>
                     <input
@@ -457,7 +457,7 @@ function Settings() {
                   </div>
 
                   <div>
-                    <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
+                    <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2" data-sb-field-path="emailLabel">
                       Email Address
                     </label>
                     <input

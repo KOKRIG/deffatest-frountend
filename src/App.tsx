@@ -10,7 +10,7 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white relative overflow-x-hidden">
+<div className="min-h-screen bg-black text-white relative overflow-x-hidden" data-sb-object-id="landingPage" data-sb-field-path=".">
       {/* Animated Background Overlay */}
       <div className="fixed inset-0 z-0 pointer-events-none">
         <div className="absolute inset-0 animated-grid-overlay"></div>
@@ -93,7 +93,7 @@ function App() {
       {/* Hero Section */}
       <section className="relative z-10 min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 pt-16">
         <div className="text-center max-w-5xl mx-auto">
-          <h1 className="font-orbitron font-black text-4xl sm:text-6xl lg:text-7xl xl:text-8xl mb-6 leading-tight bg-gradient-to-r from-purple-600 via-purple-500 to-blue-700 bg-clip-text text-transparent">
+<h1 className="font-orbitron font-black text-4xl sm:text-6xl lg:text-7xl xl:text-8xl mb-6 leading-tight bg-gradient-to-r from-purple-600 via-purple-500 to-blue-700 bg-clip-text text-transparent" data-sb-field-path="heading">
             LET OUR AI BREAK
             <br />
             YOUR APP BEFORE
@@ -101,14 +101,15 @@ function App() {
             YOUR USERS DO
           </h1>
           
-          <p className="font-inter text-xl sm:text-2xl lg:text-3xl text-gray-300 mb-12 max-w-3xl mx-auto leading-relaxed">
+<p className="font-inter text-xl sm:text-2xl lg:text-3xl text-gray-300 mb-12 max-w-3xl mx-auto leading-relaxed" data-sb-field-path="description">
             Experience autonomous testing that finds more bugs, faster, and saves you money.
           </p>
           
-          <a 
+<a 
             href="/signup" 
             className="inline-flex items-center px-8 py-4 text-lg font-semibold bg-gradient-to-r from-purple-600 to-pink-500 rounded-xl neon-glow-strong hover:from-purple-700 hover:to-pink-600 transition-all transform hover:scale-110 hover:shadow-2xl"
-          >
+            data-sb-field-path="cta">
+          
             <Rocket className="mr-3 w-6 h-6" />
             Start Your Free AI Test
           </a>
@@ -280,7 +281,7 @@ function App() {
       </section>
 
       {/* Footer */}
-      <footer className="relative z-10 bg-black/50 backdrop-blur-sm border-t border-purple-500/20 py-12 px-4 sm:px-6 lg:px-8">
+<footer className="relative z-10 bg-black/50 backdrop-blur-sm border-t border-purple-500/20 py-12 px-4 sm:px-6 lg:px-8" data-sb-field-path="footer">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="mb-6 md:mb-0">

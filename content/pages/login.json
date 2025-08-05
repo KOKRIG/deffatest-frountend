@@ -1,0 +1,28 @@
+{
+  "type": "LoginPage",
+  "slug": "login",
+  "seo": {
+    "title": "Login - DEFFATEST",
+    "description": "Sign in to your DEFFATEST account to access AI-powered app testing."
+  },
+  "heading": "Welcome Back",
+  "subheading": "Sign in to your DEFFATEST account",
+  "emailLabel": "Email Address",
+  "passwordLabel": "Password",
+  "submitButtonText": "Sign In",
+  "forgotPasswordText": "Forgot your password?",
+  "noAccountText": "Don't have an account?",
+  "signupLinkText": "Sign up for free",
+  "theme": {
+    "backgroundColor": "#000000",
+    "textColor": "#FFFFFF",
+    "primaryGradient": "from-purple-600 to-pink-500",
+    "inputBorder": "border-purple-500/30",
+    "inputFocusBorder": "focus:border-cyan-400",
+    "cardBackground": "glass-card",
+    "fonts": {
+      "heading": "font-orbitron",
+      "body": "font-inter"
+    }
+  }
+}

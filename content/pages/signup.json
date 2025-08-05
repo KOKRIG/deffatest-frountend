@@ -1,0 +1,34 @@
+{
+  "_id": "signup",
+  "type": "SignupPage",
+  "slug": "signup",
+  "seo": {
+    "title": "Sign Up - DEFFATEST",
+    "description": "Create your DEFFATEST account and start AI-powered app testing today."
+  },
+  "heading": "Join DEFFATEST",
+  "subheading": "Start your free AI testing journey",
+  "fullNameLabel": "Full Name *",
+  "emailLabel": "Email Address *",
+  "passwordLabel": "Password *",
+  "confirmPasswordLabel": "Confirm Password *",
+  "submitButtonText": "Create Account",
+  "alreadyHaveAccountText": "Already have an account?",
+  "signInLinkText": "Sign in here",
+  "background": {
+    "overlay": "animated-grid-overlay",
+    "color": "#000000"
+  },
+  "theme": {
+    "backgroundColor": "#000000",
+    "textColor": "#FFFFFF",
+    "primaryGradient": "from-purple-600 to-pink-500",
+    "inputBorder": "border-purple-500/30",
+    "inputFocusBorder": "focus:border-cyan-400",
+    "cardBackground": "glass-card",
+    "fonts": {
+      "heading": "font-orbitron",
+      "body": "font-inter"
+    }
+  }
+}

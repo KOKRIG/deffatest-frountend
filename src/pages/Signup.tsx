@@ -121,10 +121,10 @@ function Signup() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white relative overflow-x-hidden">
+    <div className="min-h-screen bg-black text-white relative overflow-x-hidden" data-sb-object-id="signup">
       {/* Animated Background Overlay */}
-      <div className="fixed inset-0 z-0 pointer-events-none">
-        <div className="absolute inset-0 animated-grid-overlay"></div>
+      <div className="fixed inset-0 z-0 pointer-events-none" data-sb-field-path="background">
+        <div className="absolute inset-0 animated-grid-overlay" data-sb-field-path="background.overlay"></div>
       </div>
 
       {/* Main Content */}
@@ -139,10 +139,10 @@ function Signup() {
                   DEFFATEST
                 </span>
               </Link>
-              <h1 className="font-orbitron font-bold text-3xl mb-2 text-white">
+              <h1 className="font-orbitron font-bold text-3xl mb-2 text-white" data-sb-field-path="heading">
                 Join DEFFATEST
               </h1>
-              <p className="text-gray-400">
+              <p className="text-gray-400" data-sb-field-path="subheading">
                 {planParam && planParam !== 'free' 
                   ? `Start your ${planParam.charAt(0).toUpperCase() + planParam.slice(1)} plan journey` 
                   : 'Start your free AI testing journey'}
@@ -162,7 +162,7 @@ function Signup() {
             {/* Signup Form */}
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
-                <label htmlFor="fullName" className="block text-sm font-medium text-gray-300 mb-2">
+                <label htmlFor="fullName" className="block text-sm font-medium text-gray-300 mb-2" data-sb-field-path="fullNameLabel">
                   Full Name *
                 </label>
                 <div className="relative">
@@ -182,7 +182,7 @@ function Signup() {
               </div>
 
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
+                <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2" data-sb-field-path="emailLabel">
                   Email Address *
                 </label>
                 <div className="relative">
@@ -202,7 +202,7 @@ function Signup() {
               </div>
 
               <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-2">
+                <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-2" data-sb-field-path="passwordLabel">
                   Password *
                 </label>
                 <div className="relative">
@@ -229,7 +229,7 @@ function Signup() {
               </div>
 
               <div>
-                <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-300 mb-2">
+                <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-300 mb-2" data-sb-field-path="confirmPasswordLabel">
                   Confirm Password *
                 </label>
                 <div className="relative">
@@ -266,7 +266,7 @@ function Signup() {
                     Creating Account...
                   </div>
                 ) : (
-                  'Create Account'
+                  <span data-sb-field-path="submitButtonText">Create Account</span>
                 )}
               </button>
             </form>
@@ -275,9 +275,9 @@ function Signup() {
             <div className="mt-6 space-y-4">
               <div className="text-center">
                 <p className="text-sm text-gray-400">
-                  Already have an account?{' '}
+                  <span data-sb-field-path="alreadyHaveAccountText">Already have an account?</span>{' '}
                   <Link to="/login" className="text-cyan-400 hover:text-cyan-300 transition-colors font-medium">
-                    Sign in here
+                    <span data-sb-field-path="signInLinkText">Sign in here</span>
                   </Link>
                 </p>
               </div>

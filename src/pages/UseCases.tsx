@@ -4,15 +4,15 @@ import Layout from '../components/Layout';
 
 function UseCases() {
   return (
-    <Layout title="Why DEFFATEST? Unlock Unprecedented Efficiency">
+    <Layout title="Why DEFFATEST? Unlock Unprecedented Efficiency" data-sb-object-id="useCasesPage">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
         {/* Introduction Section */}
         <div className="text-center mb-16">
-          <p className="text-xl lg:text-2xl text-gray-300 leading-relaxed max-w-4xl mx-auto mb-8">
+          <p className="text-xl lg:text-2xl text-gray-300 leading-relaxed max-w-4xl mx-auto mb-8" data-sb-field-path="introText">
             Manual testing is a bottleneck. Scripted automation breaks easily. DEFFATEST cuts through the noise.
           </p>
           <div className="glass-card p-8 max-w-2xl mx-auto">
-            <h2 className="font-orbitron font-bold text-2xl lg:text-3xl mb-4 bg-gradient-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent">
+            <h2 className="font-orbitron font-bold text-2xl lg:text-3xl mb-4 bg-gradient-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent" data-sb-field-path="heroHeading">
               Save Time. Save Money. Find More Bugs.
             </h2>
           </div>
@@ -26,7 +26,7 @@ function UseCases() {
               <div className="w-16 h-16 bg-gradient-to-r from-purple-600 to-pink-500 rounded-2xl flex items-center justify-center mr-4 group-hover:shadow-lg group-hover:shadow-purple-500/50 transition-all">
                 <Zap className="w-8 h-8 text-white" />
               </div>
-              <h3 className="font-orbitron font-bold text-2xl text-cyan-400">For Development Teams</h3>
+              <h3 className="font-orbitron font-bold text-2xl text-cyan-400" data-sb-field-path="useCases.0.title">For Development Teams</h3>
             </div>
             
             <div className="mb-6">
@@ -173,7 +173,7 @@ function UseCases() {
 
         {/* Impact Statistics */}
         <div className="glass-card p-12 mb-16">
-          <h2 className="font-orbitron font-bold text-3xl lg:text-4xl text-center mb-12 bg-gradient-to-r from-purple-500 to-cyan-400 bg-clip-text text-transparent">
+          <h2 className="font-orbitron font-bold text-3xl lg:text-4xl text-center mb-12 bg-gradient-to-r from-purple-500 to-cyan-400 bg-clip-text text-transparent" data-sb-field-path="statsSection.heading">
             The Numbers Don't Lie
           </h2>
           <div className="grid md:grid-cols-3 gap-8 text-center">
@@ -209,10 +209,10 @@ function UseCases() {
         {/* Call to Action */}
         <div className="text-center">
           <div className="glass-card p-8 lg:p-12 max-w-2xl mx-auto">
-            <h2 className="font-orbitron font-bold text-2xl lg:text-3xl mb-6 bg-gradient-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent">
+            <h2 className="font-orbitron font-bold text-2xl lg:text-3xl mb-6 bg-gradient-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent" data-sb-field-path="ctaSection.heading">
               Ready to Transform Your QA?
             </h2>
-            <p className="text-xl text-gray-300 mb-8 leading-relaxed">
+            <p className="text-xl text-gray-300 mb-8 leading-relaxed" data-sb-field-path="ctaSection.text">
               See exactly how DEFFATEST works and why teams love it.
             </p>
             <a 

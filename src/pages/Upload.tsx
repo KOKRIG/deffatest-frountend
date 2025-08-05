@@ -469,10 +469,10 @@ function Upload() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white relative overflow-x-hidden">
+    <div className="min-h-screen bg-black text-white relative overflow-x-hidden" data-sb-object-id="upload">
       {/* Animated Background Overlay */}
-      <div className="fixed inset-0 z-0 pointer-events-none">
-        <div className="absolute inset-0 animated-grid-overlay opacity-30"></div>
+      <div className="fixed inset-0 z-0 pointer-events-none" data-sb-field-path="background">
+        <div className="absolute inset-0 animated-grid-overlay opacity-30" data-sb-field-path="background.overlay"></div>
       </div>
 
       {/* Navigation Bar */}
@@ -571,7 +571,7 @@ function Upload() {
           {/* Choose What To Test Section */}
           {activeSection === 'choose' && canSubmitTest() && (
             <section className="space-y-8">
-              <h1 className="font-orbitron font-bold text-4xl lg:text-6xl text-center bg-gradient-to-r from-cyan-400 via-fuchsia-400 to-purple-500 bg-clip-text text-transparent">
+              <h1 className="font-orbitron font-bold text-4xl lg:text-6xl text-center bg-gradient-to-r from-cyan-400 via-fuchsia-400 to-purple-500 bg-clip-text text-transparent" data-sb-field-path="chooseTestHeading">
                 Choose What To Test
               </h1>
               <div className="flex justify-center gap-8 flex-wrap max-w-4xl mx-auto">
@@ -582,8 +582,8 @@ function Upload() {
                   <div className="w-24 h-24 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-3xl flex items-center justify-center mx-auto mb-8 group-hover:shadow-lg group-hover:shadow-cyan-500/50 transition-all">
                     <Globe className="w-12 h-12 text-white" />
                   </div>
-                  <h2 className="font-orbitron font-bold text-3xl text-cyan-400 mb-4">Web</h2>
-                  <p className="text-xl text-gray-300 leading-relaxed">Test web applications via URL or upload HTML/JS bundles</p>
+                  <h2 className="font-orbitron font-bold text-3xl text-cyan-400 mb-4" data-sb-field-path="webOptionTitle">Web</h2>
+                  <p className="text-xl text-gray-300 leading-relaxed" data-sb-field-path="webOptionDescription">Test web applications via URL or upload HTML/JS bundles</p>
                 </button>
 
                 <button
@@ -593,8 +593,8 @@ function Upload() {
                   <div className="w-24 h-24 bg-gradient-to-r from-purple-600 to-pink-500 rounded-3xl flex items-center justify-center mx-auto mb-8 group-hover:shadow-lg group-hover:shadow-purple-500/50 transition-all">
                     <Smartphone className="w-12 h-12 text-white" />
                   </div>
-                  <h2 className="font-orbitron font-bold text-3xl text-cyan-400 mb-4">App</h2>
-                  <p className="text-xl text-gray-300 leading-relaxed">Test Android applications by uploading APK files</p>
+                  <h2 className="font-orbitron font-bold text-3xl text-cyan-400 mb-4" data-sb-field-path="appOptionTitle">App</h2>
+                  <p className="text-xl text-gray-300 leading-relaxed" data-sb-field-path="appOptionDescription">Test Android applications by uploading APK files</p>
                 </button>
               </div>
             </section>
@@ -636,7 +636,7 @@ function Upload() {
                 <form onSubmit={(e) => { e.preventDefault(); submitTest('web'); }} className="space-y-8">
                   {/* Test Name */}
                   <div>
-                    <label className="block text-lg font-semibold text-gray-300 mb-3">
+                    <label className="block text-lg font-semibold text-gray-300 mb-3" data-sb-field-path="webForm.testNameLabel">
                       Test Name *
                     </label>
                     <input

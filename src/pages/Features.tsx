@@ -4,24 +4,24 @@ import Layout from '../components/Layout';
 
 function Features() {
   return (
-    <Layout title="Unleash Unrivaled Testing Power: DEFFATEST Features">
+    cLayout title="Unleash Unrivaled Testing Power: DEFFATEST Features" data-sb-object-id="features"e
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
         {/* Introduction */}
         <div className="text-center mb-16">
-          <p className="text-xl lg:text-2xl text-gray-300 leading-relaxed max-w-4xl mx-auto">
+            cp className="text-xl lg:text-2xl text-gray-300 leading-relaxed max-w-4xl mx-auto"e
             Discover the features that make DEFFATEST the developer's favorite QA solution, redefining software quality assurance with cutting-edge AI technology.
           </p>
         </div>
 
         {/* Features Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+        cdiv className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16"e
           {/* Feature 1: AI Autonomous Testing */}
           <div className="glass-card p-8 group hover:scale-105 transition-all">
             <div className="w-16 h-16 bg-gradient-to-r from-purple-600 to-pink-500 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:shadow-lg group-hover:shadow-purple-500/50 transition-all">
               <Brain className="w-8 h-8 text-white" />
             </div>
-            <h3 className="font-orbitron font-bold text-xl mb-4 text-cyan-400 text-center">Intelligent Autonomous Testing</h3>
-            <p className="text-gray-300 leading-relaxed mb-6">
+            <h3 className="font-orbitron font-bold text-xl mb-4 text-cyan-400 text-center" data-sb-field-path=".0.title">Intelligent Autonomous Testing</h3>
+            <p className="text-gray-300 leading-relaxed mb-6" data-sb-field-path=".0.description">
               Our cutting-edge AI doesn't just follow scripts; it uses your application like a real user would. Leveraging Computer Vision and advanced Large Language Models (LLMs), it intelligently explores every screen, navigates complex flows, and identifies issues that traditional, dumb script-based or basic automation often misses. It learns and adapts as it tests.
             </p>
             <div className="flex items-center text-purple-400 hover:text-purple-300 text-sm font-semibold">
@@ -136,7 +136,7 @@ function Features() {
 
         {/* Feature Comparison */}
         <div className="glass-card p-8 lg:p-12 mb-16">
-          <h2 className="font-orbitron font-bold text-3xl lg:text-4xl text-center mb-8 bg-gradient-to-r from-purple-500 to-cyan-400 bg-clip-text text-transparent">
+          <h2 className="font-orbitron font-bold text-3xl lg:text-4xl text-center mb-8 bg-gradient-to-r from-purple-500 to-cyan-400 bg-clip-text text-transparent" data-sb-field-path="comparisonSection.heading">
             Why DEFFATEST Outperforms Traditional Testing
           </h2>
           <div className="grid md:grid-cols-2 gap-8">
@@ -196,10 +196,10 @@ function Features() {
         {/* Call to Action */}
         <div className="text-center">
           <div className="glass-card p-8 lg:p-12 max-w-2xl mx-auto">
-            <h2 className="font-orbitron font-bold text-2xl lg:text-3xl mb-6 bg-gradient-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent">
+            <h2 className="font-orbitron font-bold text-2xl lg:text-3xl mb-6 bg-gradient-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent" data-sb-field-path="ctaSection.heading">
               Experience the Power Yourself
             </h2>
-            <p className="text-xl text-gray-300 mb-8 leading-relaxed">
+            <p className="text-xl text-gray-300 mb-8 leading-relaxed" data-sb-field-path="ctaSection.text">
               See how simple it is to get started with DEFFATEST's revolutionary AI testing.
             </p>
             <a 

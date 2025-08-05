@@ -1,10 +1,49 @@
 {
-    "title": "Start Your AI-Powered Test",
-    "webOptionTitle": "Test a Web Application",
-    "webOptionDescription": "Provide a URL or upload a code bundle.",
-    "appOptionTitle": "Test an Android App",
-    "appOptionDescription": "Upload your APK file to begin testing.",
-    "slotsFullTitle": "All Test Slots Are Currently in Use",
-    "slotsFullMessage": "Please wait for a test to complete before starting a new one. You can view your live tests on the dashboard."
+  "_id": "upload",
+  "type": "UploadPage",
+  "slug": "upload",
+  "seo": {
+    "title": "Upload Test - DEFFATEST",
+    "description": "Submit your web or app tests for AI-powered QA testing."
+  },
+  "chooseTestHeading": "Choose What To Test",
+  "webOptionTitle": "Web",
+  "webOptionDescription": "Test web applications via URL or upload HTML/JS bundles",
+  "appOptionTitle": "App",
+  "appOptionDescription": "Test Android applications by uploading APK files",
+  "liveTestsHeading": "Live Tests",
+  "testHistoryHeading": "TEST HISTORY",
+  "slotsFullTitle": "Test Slots Full",
+  "slotsFullMessage": "You have reached your maximum concurrent live test slots. Please wait for a test to complete or cancel one to submit a new test.",
+  "webForm": {
+    "testNameLabel": "Test Name *",
+    "testDurationLabel": "Test Duration",
+    "inputTypeLabel": "Test Input Type",
+    "urlLabel": "Web Application URL *",
+    "uploadLabel": "Web Bundle Upload (.zip only) *",
+    "submitButtonText": "Start the Test"
+  },
+  "appForm": {
+    "testNameLabel": "Test Name *",
+    "testDurationLabel": "Test Duration",
+    "fileTypeLabel": "App File Type",
+    "uploadLabel": "App File Upload (.apk only) *",
+    "submitButtonText": "Start the Test"
+  },
+  "background": {
+    "overlay": "animated-grid-overlay",
+    "opacity": 30,
+    "color": "#000000"
+  },
+  "theme": {
+    "backgroundColor": "#000000",
+    "textColor": "#FFFFFF",
+    "primaryGradient": "from-purple-600 to-pink-500",
+    "glassCard": "glass-card",
+    "fonts": {
+      "heading": "font-orbitron",
+      "body": "font-inter"
+    }
+  }
 }
 

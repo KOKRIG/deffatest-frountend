@@ -165,6 +165,222 @@ const genericPage = {
     ]
 };
 
+// Landing/Home Page
+const homePage = {
+  name: "HomePage",
+  type: "page",
+  urlPath: "/",
+  filePath: "content/pages/home.json",
+  fields: [
+    { name: "heroTitle", type: "string", label: "Hero Title" },
+    { name: "heroSubtitle", type: "string", label: "Hero Subtitle" },
+    { name: "heroImage", type: "image", label: "Hero Background Image" },
+    { name: "features", type: "list", label: "Features", items: { type: "object", fields: [
+      { name: "icon", type: "string" },
+      { name: "title", type: "string" },
+      { name: "description", type: "text" }
+    ]}},
+    { name: "theme", type: "style", fields: theme.fields }
+  ]
+};
+
+// Contact Page
+const contactPage = {
+  name: "ContactPage",
+  type: "page",
+  urlPath: "/contact-us",
+  filePath: "content/pages/contact.json",
+  fields: [
+    { name: "title", type: "string", label: "Page Title" },
+    { name: "subtitle", type: "string", label: "Page Subtitle" },
+    { name: "email", type: "string", label: "Contact Email" },
+    { name: "phone", type: "string", label: "Contact Phone" },
+    { name: "address", type: "text", label: "Address" },
+    { name: "theme", type: "style", fields: theme.fields }
+  ]
+};
+
+// Features Page
+const featuresPage = {
+  name: "FeaturesPage",
+  type: "page",
+  urlPath: "/features",
+  filePath: "content/pages/features.json",
+  fields: [
+    { name: "title", type: "string", label: "Page Title" },
+    { name: "subtitle", type: "string", label: "Page Subtitle" },
+    { name: "features", type: "list", label: "Features List", items: { type: "object", fields: [
+      { name: "title", type: "string" },
+      { name: "description", type: "text" },
+      { name: "icon", type: "string" },
+      { name: "image", type: "image" }
+    ]}},
+    { name: "theme", type: "style", fields: theme.fields }
+  ]
+};
+
+// Pricing Page (Public)
+const pricingPage = {
+  name: "PricingPage",
+  type: "page",
+  urlPath: "/pricing",
+  filePath: "content/pages/pricing-public.json",
+  fields: [
+    { name: "title", type: "string", label: "Page Title" },
+    { name: "subtitle", type: "string", label: "Page Subtitle" },
+    { name: "plans", type: "list", label: "Pricing Plans", items: { type: "object", fields: plan.fields }},
+    { name: "theme", type: "style", fields: theme.fields }
+  ]
+};
+
+// How It Works Page
+const howItWorksPage = {
+  name: "HowItWorksPage",
+  type: "page",
+  urlPath: "/how-it-works",
+  filePath: "content/pages/how-it-works.json",
+  fields: [
+    { name: "title", type: "string", label: "Page Title" },
+    { name: "steps", type: "list", label: "Process Steps", items: { type: "object", fields: [
+      { name: "number", type: "string" },
+      { name: "title", type: "string" },
+      { name: "description", type: "text" },
+      { name: "image", type: "image" }
+    ]}},
+    { name: "theme", type: "style", fields: theme.fields }
+  ]
+};
+
+// Use Cases Page
+const useCasesPage = {
+  name: "UseCasesPage",
+  type: "page",
+  urlPath: "/use-cases",
+  filePath: "content/pages/use-cases.json",
+  fields: [
+    { name: "title", type: "string", label: "Page Title" },
+    { name: "cases", type: "list", label: "Use Cases", items: { type: "object", fields: [
+      { name: "title", type: "string" },
+      { name: "description", type: "text" },
+      { name: "industry", type: "string" },
+      { name: "image", type: "image" }
+    ]}},
+    { name: "theme", type: "style", fields: theme.fields }
+  ]
+};
+
+// Documentation Page
+const documentationPage = {
+  name: "DocumentationPage",
+  type: "page",
+  urlPath: "/docs",
+  filePath: "content/pages/documentation.json",
+  fields: [
+    { name: "title", type: "string", label: "Page Title" },
+    { name: "sections", type: "list", label: "Doc Sections", items: { type: "object", fields: [
+      { name: "title", type: "string" },
+      { name: "content", type: "markdown" }
+    ]}},
+    { name: "theme", type: "style", fields: theme.fields }
+  ]
+};
+
+// Legal Pages
+const termsPage = {
+  name: "TermsPage",
+  type: "page",
+  urlPath: "/terms",
+  filePath: "content/pages/terms.json",
+  fields: [
+    { name: "title", type: "string", label: "Page Title" },
+    { name: "content", type: "markdown", label: "Terms Content" },
+    { name: "lastUpdated", type: "date", label: "Last Updated" },
+    { name: "theme", type: "style", fields: theme.fields }
+  ]
+};
+
+const privacyPage = {
+  name: "PrivacyPage",
+  type: "page",
+  urlPath: "/privacy-policy",
+  filePath: "content/pages/privacy.json",
+  fields: [
+    { name: "title", type: "string", label: "Page Title" },
+    { name: "content", type: "markdown", label: "Privacy Policy Content" },
+    { name: "lastUpdated", type: "date", label: "Last Updated" },
+    { name: "theme", type: "style", fields: theme.fields }
+  ]
+};
+
+const cookiePolicyPage = {
+  name: "CookiePolicyPage",
+  type: "page",
+  urlPath: "/cookie-policy",
+  filePath: "content/pages/cookie-policy.json",
+  fields: [
+    { name: "title", type: "string", label: "Page Title" },
+    { name: "content", type: "markdown", label: "Cookie Policy Content" },
+    { name: "lastUpdated", type: "date", label: "Last Updated" },
+    { name: "theme", type: "style", fields: theme.fields }
+  ]
+};
+
+// Auth Pages
+const loginPage = {
+  name: "LoginPage",
+  type: "page",
+  urlPath: "/login",
+  filePath: "content/pages/login.json",
+  fields: [
+    { name: "title", type: "string", label: "Page Title" },
+    { name: "subtitle", type: "string", label: "Page Subtitle" },
+    { name: "forgotPasswordText", type: "string", label: "Forgot Password Text" },
+    { name: "signUpText", type: "string", label: "Sign Up Text" },
+    { name: "theme", type: "style", fields: theme.fields }
+  ]
+};
+
+const signupPage = {
+  name: "SignupPage",
+  type: "page",
+  urlPath: "/signup",
+  filePath: "content/pages/signup.json",
+  fields: [
+    { name: "title", type: "string", label: "Page Title" },
+    { name: "subtitle", type: "string", label: "Page Subtitle" },
+    { name: "loginText", type: "string", label: "Login Text" },
+    { name: "theme", type: "style", fields: theme.fields }
+  ]
+};
+
+// Dashboard Pages
+const resultsPage = {
+  name: "ResultsPage",
+  type: "page",
+  urlPath: "/results",
+  filePath: "content/pages/results.json",
+  fields: [
+    { name: "title", type: "string", label: "Page Title" },
+    { name: "emptyStateText", type: "string", label: "Empty State Text" },
+    { name: "theme", type: "style", fields: theme.fields }
+  ]
+};
+
+const settingsPage = {
+  name: "SettingsPage",
+  type: "page",
+  urlPath: "/settings",
+  filePath: "content/pages/settings.json",
+  fields: [
+    { name: "title", type: "string", label: "Page Title" },
+    { name: "sections", type: "list", label: "Settings Sections", items: { type: "object", fields: [
+      { name: "title", type: "string" },
+      { name: "description", type: "string" }
+    ]}},
+    { name: "theme", type: "style", fields: theme.fields }
+  ]
+};
+
 // ##################################################################
 // ### STACKBIT CONFIG ##############################################
 // ##################################################################
@@ -179,9 +395,23 @@ export default defineStackbitConfig({
       contentDirs: ["content"],
       models: [
         // Page models
+        homePage,
         dashboardPage,
         dashboardPricingPage,
         uploadPage,
+        resultsPage,
+        settingsPage,
+        contactPage,
+        featuresPage,
+        pricingPage,
+        howItWorksPage,
+        useCasesPage,
+        documentationPage,
+        termsPage,
+        privacyPage,
+        cookiePolicyPage,
+        loginPage,
+        signupPage,
         genericPage,
         // Component models
         button,
@@ -197,13 +427,36 @@ export default defineStackbitConfig({
       },
     }),
   ],
-  siteMap: ({ documents }) => {
-    return documents.map((doc) => ({
-        stableId: doc.id,
-        urlPath: doc.urlPath,
-        document: doc,
-        isHomePage: doc.urlPath === '/',
-    }));
+  siteMap: ({ documents, models }) => {
+    // Filter all page models
+    const pageModels = models.filter((m) => m.type === "page");
+
+    return documents
+      // Filter all documents which are of a page model
+      .filter((d) => pageModels.some(m => m.name === d.modelName))
+      // Map each document to a SiteMapEntry
+      .map((document) => {
+        // Find the model for this document
+        const model = models.find(m => m.name === document.modelName);
+        if (!model) return null;
+
+        // Use the urlPath from the model or construct it dynamically
+        let urlPath = model.urlPath || '/';
+        
+        // Replace placeholders in the URL path
+        if (urlPath.includes('{slug}')) {
+          const slug = document.fields?.slug?.value || document.id;
+          urlPath = urlPath.replace('{slug}', slug);
+        }
+
+        return {
+          stableId: document.id,
+          urlPath: urlPath,
+          document,
+          isHomePage: urlPath === '/',
+        };
+      })
+      .filter(Boolean);
   },
 });
 
