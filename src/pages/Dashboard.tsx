@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
@@ -7,10 +6,7 @@ import DashboardHeader from '../components/dashboard/DashboardHeader';
 import PlanUsage from '../components/dashboard/PlanUsage';
 import RecentTests from '../components/dashboard/RecentTests';
 import { supabase, Test } from '../lib/supabase';
-import { initializePaddle } from '../lib/paddle';
-import { preFetchDashboardData } from '../lib/api';
-import { Rocket, Clock, Zap, Bug, TrendingUp, Eye, ArrowRight, Activity, Globe, Smartphone, CheckCircle, Play, XCircle, RefreshCw, AlertTriangle } from 'lucide-react';
-import dashboardContent from '../../content/pages/dashboard.json';
+import { Rocket, Clock, Zap, Bug, TrendingUp, Eye, ArrowRight, Activity } from 'lucide-react';
 
 function Dashboard() {
   const { user, profile } = useAuth();
@@ -26,8 +22,6 @@ function Dashboard() {
       return;
     }
     fetchDashboardData();
-    initializePaddle();
-    preFetchDashboardData();
   }, [user, navigate]);
 
   const fetchDashboardData = async () => {
@@ -35,20 +29,22 @@ function Dashboard() {
       setLoading(true);
       setError('');
 
+      // Fetch tests
       const { data: testsData, error: testsError } = await supabase
         .from('tests')
         .select('*')
-        .order('submitted_at', { ascending: false })
+        .order('submitted_at', { ascending: false }) // Changed from created_at
         .limit(10);
 
       if (testsError) throw testsError;
 
+      // Split into recent completed tests and live tests
       const completedTests = (testsData || []).filter(test => 
         test.status === 'completed' || test.status === 'failed'
       ).slice(0, 5);
 
       const activeTests = (testsData || []).filter(test => 
-        test.status === 'queued' || test.status === 'running' || test.status === 'processing_results'
+        test.status === 'queued' || test.status === 'running' || test.status === 'processing_results' // Changed 'pending' to 'queued'
       );
 
       setRecentTests(completedTests);
@@ -61,17 +57,19 @@ function Dashboard() {
     }
   };
 
+  // Get number of tests remaining based on plan type
   const getTestsRemaining = () => {
     if (!profile) return 0;
     
-    const planType = profile.plan_type;
+    const planType = profile.plan_type; // Changed from subscription_plan
     const testsThisMonth = profile.tests_this_month_count || 0;
     
     if (planType === 'chaos') return Infinity;
     if (planType === 'pro') return Math.max(25 - testsThisMonth, 0);
-    return Math.max(1 - testsThisMonth, 0);
+    return Math.max(1 - testsThisMonth, 0); // Free plan
   };
 
+  // Check if user can start a new test (has available concurrent slots)
   const canStartNewTest = () => {
     if (!profile) return false;
     
@@ -81,6 +79,7 @@ function Dashboard() {
     return usedSlots < totalSlots;
   };
 
+  // Calculate plan info for PlanUsage component
   const getPlanInfo = () => {
     if (!profile) return {
       planType: 'free',
@@ -90,7 +89,7 @@ function Dashboard() {
       usedSlots: 0
     };
 
-    const planType = profile.plan_type;
+    const planType = profile.plan_type; // Changed from subscription_plan
     let testsLimit = 1;
     
     if (planType === 'pro') testsLimit = 25;
@@ -153,23 +152,25 @@ function Dashboard() {
   }
 
   return (
-    <DashboardLayout currentPage="dashboard" data-sb-object-id={dashboardContent.pageTitle}>
+    <DashboardLayout currentPage="dashboard">
+      {/* Header with User Greeting and Plan Info */}
       <DashboardHeader 
-        data-sb-field-path="header"
         userName={profile?.full_name || user?.email || 'User'}
-        planType={profile?.plan_type || 'free'}
+        planType={profile?.plan_type || 'free'} // Changed from subscription_plan
         stats={{
           testsThisMonth: profile?.tests_this_month_count || 0,
           testsRemaining: getTestsRemaining(),
-          lastTestDate: recentTests[0]?.submitted_at
+          lastTestDate: recentTests[0]?.submitted_at // Changed from created_at
         }}
       />
 
       <div className="grid lg:grid-cols-3 gap-8 mb-8">
-        <div className="lg:col-span-1" data-sb-field-path="planUsageSection">
+        {/* Plan Usage */}
+        <div className="lg:col-span-1">
           <PlanUsage planInfo={getPlanInfo()} />
         </div>
         
+        {/* Recent Tests */}
         <div className="lg:col-span-2">
           <RecentTests 
             tests={recentTests} 
@@ -178,32 +179,63 @@ function Dashboard() {
         </div>
       </div>
 
-      <div className="glass-card p-8 mb-8" data-sb-field-path=".quickActionsSection">
-        <h2 className="font-orbitron font-bold text-2xl text-cyan-400 mb-6" data-sb-field-path=".title">{dashboardContent.quickActionsSection.title}</h2>
+      {/* Quick Actions */}
+      <div className="glass-card p-8 mb-8">
+        <h2 className="font-orbitron font-bold text-2xl text-cyan-400 mb-6">Quick Actions</h2>
         
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6" data-sb-field-path=".actions">
-          {dashboardContent.quickActionsSection.actions.map((action, index) => (
-            <button
-              key={index}
-              onClick={() => navigate(action.url)}
-              disabled={action.url === '/upload' && !canStartNewTest()}
-              className={`p-6 rounded-xl border-2 transition-all text-center ${
-                action.url === '/upload' && !canStartNewTest() 
-                  ? 'border-gray-700 bg-gray-800/50 cursor-not-allowed opacity-50' 
-                  : 'border-purple-500/30 hover:border-purple-500/60 hover:bg-purple-500/10'
-              }`}
-              data-sb-field-path={`.${index}`}
-            >
-              <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center mx-auto mb-3">
-                <Rocket className="w-6 h-6 text-white" />
-              </div>
-              <h3 className="font-semibold text-lg mb-1 text-white" data-sb-field-path=".text">{action.text}</h3>
-              <p className="text-sm text-gray-400" data-sb-field-path=".description">{action.description}</p>
-            </button>
-          ))}
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <button
+            onClick={() => navigate('/upload')}
+            disabled={!canStartNewTest()}
+            className={`p-6 rounded-xl border-2 transition-all text-center ${
+              canStartNewTest() 
+                ? 'border-purple-500/30 hover:border-purple-500/60 hover:bg-purple-500/10' 
+                : 'border-gray-700 bg-gray-800/50 cursor-not-allowed opacity-50'
+            }`}
+          >
+            <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center mx-auto mb-3">
+              <Rocket className="w-6 h-6 text-white" />
+            </div>
+            <h3 className="font-semibold text-lg mb-1 text-white">Start New Test</h3>
+            <p className="text-sm text-gray-400">Launch a new AI test run</p>
+          </button>
+
+          <button
+            onClick={() => navigate('/results')}
+            className="p-6 rounded-xl border-2 border-purple-500/30 hover:border-purple-500/60 hover:bg-purple-500/10 transition-all text-center"
+          >
+            <div className="w-12 h-12 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-lg flex items-center justify-center mx-auto mb-3">
+              <Eye className="w-6 h-6 text-white" />
+            </div>
+            <h3 className="font-semibold text-lg mb-1 text-white">View Results</h3>
+            <p className="text-sm text-gray-400">Browse all test reports</p>
+          </button>
+
+          <button
+            onClick={() => navigate('/dashboard/pricing')}
+            className="p-6 rounded-xl border-2 border-purple-500/30 hover:border-purple-500/60 hover:bg-purple-500/10 transition-all text-center"
+          >
+            <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-teal-500 rounded-lg flex items-center justify-center mx-auto mb-3">
+              <TrendingUp className="w-6 h-6 text-white" />
+            </div>
+            <h3 className="font-semibold text-lg mb-1 text-white">Manage Plan</h3>
+            <p className="text-sm text-gray-400">Review or upgrade your plan</p>
+          </button>
+
+          <button
+            onClick={() => navigate('/settings')}
+            className="p-6 rounded-xl border-2 border-purple-500/30 hover:border-purple-500/60 hover:bg-purple-500/10 transition-all text-center"
+          >
+            <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-red-500 rounded-lg flex items-center justify-center mx-auto mb-3">
+              <Activity className="w-6 h-6 text-white" />
+            </div>
+            <h3 className="font-semibold text-lg mb-1 text-white">Settings</h3>
+            <p className="text-sm text-gray-400">Manage account settings</p>
+          </button>
         </div>
       </div>
 
+      {/* Live Tests Section */}
       {liveTests.length > 0 && (
         <div className="glass-card p-8">
           <h2 className="font-orbitron font-bold text-2xl text-cyan-400 mb-6">Tests In Progress</h2>
@@ -230,13 +262,14 @@ function Dashboard() {
                   <div className="flex items-center space-x-2">
                     {getStatusIcon(test.status)}
                     <span className={`font-medium ${getStatusColor(test.status)}`}>
-                      {test.status === 'queued' ? 'Queued' :
+                      {test.status === 'queued' ? 'Queued' : // Changed from 'pending'
                        test.status === 'running' ? 'Running' :
                        'Processing'}
                     </span>
                   </div>
                 </div>
                 
+                {/* Progress Bar */}
                 <div className="w-full bg-gray-700 rounded-full h-2 overflow-hidden">
                   <div 
                     className="h-full bg-gradient-to-r from-cyan-400 to-purple-500 rounded-full transition-all duration-500 ease-out"
@@ -251,6 +284,7 @@ function Dashboard() {
     </DashboardLayout>
   );
 
+  // Helper functions
   function getStatusIcon(status: string) {
     switch (status) {
       case 'completed':
@@ -259,7 +293,7 @@ function Dashboard() {
         return <Play className="w-5 h-5 text-blue-400" />;
       case 'failed':
         return <XCircle className="w-5 h-5 text-red-400" />;
-      case 'queued':
+      case 'queued': // Changed from 'pending'
         return <Clock className="w-5 h-5 text-yellow-400" />;
       case 'processing_results':
         return <RefreshCw className="w-5 h-5 text-cyan-400 animate-spin" />;
@@ -276,7 +310,7 @@ function Dashboard() {
         return 'text-blue-400';
       case 'failed':
         return 'text-red-400';
-      case 'queued':
+      case 'queued': // Changed from 'pending'
         return 'text-yellow-400';
       case 'processing_results':
         return 'text-cyan-400';

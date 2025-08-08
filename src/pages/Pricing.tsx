@@ -95,7 +95,7 @@ function Pricing() {
   };
 
   return (
-    <Layout title="Choose Your DEFFATEST Plan" data-sb-object-id="pricing">
+    <Layout title="Choose Your DEFFATEST Plan">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
         {/* Success/Error Messages */}
         {success && (
@@ -118,7 +118,7 @@ function Pricing() {
         
         {/* Introduction */}
         <div className="text-center my-16">
-          <p className="text-xl lg:text-2xl text-gray-300 leading-relaxed max-w-4xl mx-auto" data-sb-field-path="introText">
+          <p className="text-xl lg:text-2xl text-gray-300 leading-relaxed max-w-4xl mx-auto">
             Experience the power of AI-driven testing. Start free, upgrade anytime to unlock unlimited potential.
           </p>
         </div>
@@ -151,7 +151,7 @@ function Pricing() {
                      planId === 'pro' ? <Rocket className="w-8 h-8 text-white" /> :
                      <Crown className="w-8 h-8 text-white" />}
                   </div>
-              <h3 className="font-orbitron font-bold text-2xl text-cyan-400 mb-2">{plan.name}</h3>
+                <h3 className="font-orbitron font-bold text-2xl text-cyan-400 mb-2">{plan.name}</h3>
                 <div className="mb-4">
                   <span className="text-4xl font-bold text-white">{plan.price}</span>
                   <span className="text-gray-400 ml-2">/{plan.period}</span>
@@ -184,7 +184,7 @@ function Pricing() {
         
         {/* ROI Comparison */}
         <div className="glass-card p-8 lg:p-12 mb-16">
-          <h2 className="font-orbitron font-bold text-3xl lg:text-4xl text-center mb-12 bg-gradient-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent" data-sb-field-path="roiSection.heading">
+          <h2 className="font-orbitron font-bold text-3xl lg:text-4xl text-center mb-12 bg-gradient-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent">
             Return on Investment
           </h2>
           
@@ -242,7 +242,7 @@ function Pricing() {
 
         {/* FAQ Section */}
         <div className="glass-card p-8 lg:p-12 mb-16">
-          <h2 className="font-orbitron font-bold text-3xl lg:text-4xl text-center mb-12 bg-gradient-to-r from-purple-500 to-cyan-400 bg-clip-text text-transparent" data-sb-field-path="faqSection.heading">
+          <h2 className="font-orbitron font-bold text-3xl lg:text-4xl text-center mb-12 bg-gradient-to-r from-purple-500 to-cyan-400 bg-clip-text text-transparent">
             Frequently Asked Questions
           </h2>
           
@@ -280,10 +280,10 @@ function Pricing() {
         {/* Final Call to Action */}
         <div className="text-center">
           <div className="glass-card p-8 lg:p-12 max-w-2xl mx-auto">
-            <h2 className="font-orbitron font-bold text-2xl lg:text-3xl mb-6 bg-gradient-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent" data-sb-field-path="ctaSection.heading">
+            <h2 className="font-orbitron font-bold text-2xl lg:text-3xl mb-6 bg-gradient-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent">
               Ready to Transform Your QA Process?
             </h2>
-            <p className="text-xl text-gray-300 mb-8 leading-relaxed" data-sb-field-path="ctaSection.text">
+            <p className="text-xl text-gray-300 mb-8 leading-relaxed">
               Start with our Free plan today, no credit card required.
             </p>
             <button 

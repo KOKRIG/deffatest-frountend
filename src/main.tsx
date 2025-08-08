@@ -21,9 +21,11 @@ import Results from './pages/Results.tsx';
 import TestReport from './pages/TestReport.tsx';
 import Settings from './pages/Settings.tsx';
 import DashboardPricing from './pages/DashboardPricing.tsx';
+import BoltBadge from './pages/BoltBadge.tsx';
 import LogoPage from './pages/LogoPage.tsx';
 import ScrollToTop from './components/ScrollToTop.tsx';
 import ProtectedRoute from './components/ProtectedRoute.tsx';
+import BoltBadgeComponent from './components/BoltBadge.tsx';
 import LoadingScreen from './components/LoadingScreen.tsx';
 import { AuthProvider } from './contexts/AuthContext.tsx';
 import { initializePaddle } from './lib/paddle.ts';
@@ -110,6 +112,7 @@ preloadLogo().finally(() => {
             <Route path="/signup" element={<Signup />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/update-password" element={<UpdatePassword />} />
+            <Route path="/bolt-badge" element={<BoltBadge />} />
             <Route path="/logo" element={<LogoPage />} />
             <Route 
               path="/dashboard" 
@@ -160,6 +163,9 @@ preloadLogo().finally(() => {
               } 
             />
           </Routes>
+          
+          {/* Global Bolt Badge - appears on every page */}
+          <BoltBadgeComponent />
         </AuthProvider>
       </BrowserRouter>
     </StrictMode>

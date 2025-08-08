@@ -318,54 +318,74 @@ function Upload() {
   const submitTest = async (type: 'web' | 'app') => {
     if (!validateForm(type)) return;
     
+    // Check concurrent test limits
     if (userPlan && liveTests.length >= userPlan.maxConcurrentTests) {
-        setError(`You have reached your maximum of ${userPlan.maxConcurrentTests} concurrent live test slots.`);
-        return;
+      setError(`You have reached your maximum of ${userPlan.maxConcurrentTests} concurrent live test slots. Please wait for a test to complete or cancel one to submit a new test.`);
+      return;
     }
 
     setLoading(true);
     setError('');
 
     try {
-        let testRequest;
+      let testRequest;
+      
+      if (type === 'web') {
+        testRequest = {
+          test_name: webFormData.test_name,
+          test_type: webFormData.inputType === 'url' ? 'web_url' as const : 'web_bundle' as const,
+          test_source_url: webFormData.inputType === 'url' ? webFormData.test_source_url : undefined,
+          requested_duration_minutes: webFormData.requested_duration_minutes,
+          plan_type_at_submission: profile?.plan_type || 'free',
+          file: webFormData.inputType === 'bundle' ? webFormData.file : undefined
+        };
+      } else {
+        testRequest = {
+          test_name: appFormData.test_name,
+          test_type: 'android_apk' as const,
+          requested_duration_minutes: appFormData.requested_duration_minutes,
+          plan_type_at_submission: profile?.plan_type || 'free',
+          file: appFormData.file
+        };
+      }
+
+      const response = await apiClient.submitTest(testRequest);
+
+      if (response.success && response.data) {
+        setSuccess('Test initiated successfully! Tracking your progress below.');
         
+        // Reset form
         if (type === 'web') {
-            // FIX: The keys here now match your 'api.ts' file exactly
-            testRequest = {
-                test_name: webFormData.test_name,
-                test_type: webFormData.inputType === 'url' ? 'web_url' as const : 'web_bundle' as const,
-                requested_duration_minutes: webFormData.requested_duration_minutes,
-                test_source_url: webFormData.inputType === 'url' ? webFormData.test_source_url : undefined,
-                plan_type_at_submission: profile?.plan_type || 'free',
-                file: webFormData.inputType === 'bundle' ? webFormData.file : undefined
-            };
+          setWebFormData({
+            test_name: '',
+            inputType: 'url',
+            test_source_url: '',
+            requested_duration_minutes: 5,
+            file: null
+          });
         } else {
-            // FIX: This part for the app form also needs to use the correct keys
-            testRequest = {
-                test_name: appFormData.test_name,
-                test_type: 'android_apk' as const,
-                requested_duration_minutes: appFormData.requested_duration_minutes,
-                plan_type_at_submission: profile?.plan_type || 'free',
-                file: appFormData.file
-            };
+          setAppFormData({
+            test_name: '',
+            requested_duration_minutes: 5,
+            fileType: 'apk',
+            file: null
+          });
         }
 
-        const response = await apiClient.submitTest(testRequest);
-
-        if (response.success && response.data) {
-            setSuccess('Test initiated successfully! Tracking your progress below.');
-            // ... rest of your success logic ...
-            setActiveSection('choose');
-            await fetchLiveTests();
-        } else {
-            throw new Error(response.error || 'Failed to submit test');
-        }
+        // Refresh data
+        await fetchLiveTests();
+        
+        // Hide form and show choose section
+        setActiveSection('choose');
+      } else {
+        throw new Error(response.error || 'Failed to submit test');
+      }
     } catch (error: any) {
-        setError(handleApiError(error.message || 'An error occurred while submitting the test'));
+      setError(handleApiError(error.message || 'An error occurred while submitting the test'));
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
-};
+  };
 
   const cancelTest = async (testId: string) => {
     try {
@@ -469,10 +489,10 @@ function Upload() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white relative overflow-x-hidden" data-sb-object-id="upload">
+    <div className="min-h-screen bg-black text-white relative overflow-x-hidden">
       {/* Animated Background Overlay */}
-      <div className="fixed inset-0 z-0 pointer-events-none" data-sb-field-path="background">
-        <div className="absolute inset-0 animated-grid-overlay opacity-30" data-sb-field-path="background.overlay"></div>
+      <div className="fixed inset-0 z-0 pointer-events-none">
+        <div className="absolute inset-0 animated-grid-overlay opacity-30"></div>
       </div>
 
       {/* Navigation Bar */}
@@ -571,7 +591,7 @@ function Upload() {
           {/* Choose What To Test Section */}
           {activeSection === 'choose' && canSubmitTest() && (
             <section className="space-y-8">
-              <h1 className="font-orbitron font-bold text-4xl lg:text-6xl text-center bg-gradient-to-r from-cyan-400 via-fuchsia-400 to-purple-500 bg-clip-text text-transparent" data-sb-field-path="chooseTestHeading">
+              <h1 className="font-orbitron font-bold text-4xl lg:text-6xl text-center bg-gradient-to-r from-cyan-400 via-fuchsia-400 to-purple-500 bg-clip-text text-transparent">
                 Choose What To Test
               </h1>
               <div className="flex justify-center gap-8 flex-wrap max-w-4xl mx-auto">
@@ -582,8 +602,8 @@ function Upload() {
                   <div className="w-24 h-24 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-3xl flex items-center justify-center mx-auto mb-8 group-hover:shadow-lg group-hover:shadow-cyan-500/50 transition-all">
                     <Globe className="w-12 h-12 text-white" />
                   </div>
-                  <h2 className="font-orbitron font-bold text-3xl text-cyan-400 mb-4" data-sb-field-path="webOptionTitle">Web</h2>
-                  <p className="text-xl text-gray-300 leading-relaxed" data-sb-field-path="webOptionDescription">Test web applications via URL or upload HTML/JS bundles</p>
+                  <h2 className="font-orbitron font-bold text-3xl text-cyan-400 mb-4">Web</h2>
+                  <p className="text-xl text-gray-300 leading-relaxed">Test web applications via URL or upload HTML/JS bundles</p>
                 </button>
 
                 <button
@@ -593,8 +613,8 @@ function Upload() {
                   <div className="w-24 h-24 bg-gradient-to-r from-purple-600 to-pink-500 rounded-3xl flex items-center justify-center mx-auto mb-8 group-hover:shadow-lg group-hover:shadow-purple-500/50 transition-all">
                     <Smartphone className="w-12 h-12 text-white" />
                   </div>
-                  <h2 className="font-orbitron font-bold text-3xl text-cyan-400 mb-4" data-sb-field-path="appOptionTitle">App</h2>
-                  <p className="text-xl text-gray-300 leading-relaxed" data-sb-field-path="appOptionDescription">Test Android applications by uploading APK files</p>
+                  <h2 className="font-orbitron font-bold text-3xl text-cyan-400 mb-4">App</h2>
+                  <p className="text-xl text-gray-300 leading-relaxed">Test Android applications by uploading APK files</p>
                 </button>
               </div>
             </section>
@@ -636,7 +656,7 @@ function Upload() {
                 <form onSubmit={(e) => { e.preventDefault(); submitTest('web'); }} className="space-y-8">
                   {/* Test Name */}
                   <div>
-                    <label className="block text-lg font-semibold text-gray-300 mb-3" data-sb-field-path="webForm.testNameLabel">
+                    <label className="block text-lg font-semibold text-gray-300 mb-3">
                       Test Name *
                     </label>
                     <input
@@ -1092,12 +1112,11 @@ function Upload() {
               <AlertTriangle className="w-20 h-20 text-red-400 mx-auto mb-6" />
               <h2 className="text-3xl font-bold text-red-400 mb-6">Confirm Test Cancellation</h2>
               <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-6 mb-8">
-                  <p className="text-red-300 text-lg leading-relaxed font-semibold">
-                    <strong>WARNING:</strong> If this test is cancelled, the system will NOT provide any result file or any test report. 
-                    It will immediately terminate the current session and permanently delete ALL files related 
-                    to this test from the system. All progress will be irreversibly terminated and unrecoverable. 
-                    However, this will free up your test slot, allowing you to start a new test.
-                  </p>
+                <p className="text-red-300 text-lg leading-relaxed font-semibold">
+                  <strong>WARNING:</strong> If this test is cancelled, the system will NOT provide any result file or any test report. 
+                  It will immediately terminate the current session and permanently delete ALL files related 
+                  to this test from the system. All progress will be irreversibly terminated and unrecoverable.
+                </p>
               </div>
               <div className="flex space-x-6">
                 <button

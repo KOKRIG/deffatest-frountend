@@ -39,10 +39,10 @@ function ContactUs() {
   const isFormValid = formData.name && formData.email && formData.subject && formData.message;
 
   return (
-    <Layout title="Get In Touch" data-sb-object-id="contact-us">
+    <Layout title="Get In Touch">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
         <div className="text-center mb-12">
-          <p className="text-xl text-gray-300 leading-relaxed max-w-2xl mx-auto" data-sb-field-path="introText">
+          <p className="text-xl text-gray-300 leading-relaxed max-w-2xl mx-auto">
             Have questions about DEFFATEST, need support, or interested in a partnership? We're here to help!
           </p>
         </div>
@@ -54,20 +54,20 @@ function ContactUs() {
               <div className="w-12 h-12 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-lg flex items-center justify-center mr-4">
                 <Mail className="w-6 h-6 text-white" />
               </div>
-              <h2 className="text-2xl font-bold text-cyan-400" data-sb-field-path="emailSection.heading">Direct Email Support</h2>
+              <h2 className="text-2xl font-bold text-cyan-400">Direct Email Support</h2>
             </div>
             
-            <p className="text-gray-300 leading-relaxed mb-6" data-sb-field-path="emailSection.description">
+            <p className="text-gray-300 leading-relaxed mb-6">
               For immediate assistance or detailed inquiries, reach out to us directly via email. We typically respond within 24 hours.
             </p>
             
             <div className="bg-gradient-to-r from-purple-500/20 to-cyan-500/20 border border-purple-500/30 rounded-lg p-6 text-center">
-              <p className="text-white font-semibold mb-2" data-sb-field-path="emailSection.emailLabel">Email us at:</p>
+              <p className="text-white font-semibold mb-2">Email us at:</p>
               <a 
                 href="mailto:studio54code@deffatest.online" 
                 className="text-2xl font-bold text-cyan-400 hover:text-cyan-300 transition-colors neon-glow inline-block"
               >
-                <span data-sb-field-path="emailSection.emailAddress">studio54code@deffatest.online</span>
+                studio54code@deffatest.online
               </a>
             </div>
 
@@ -96,7 +96,7 @@ function ContactUs() {
 
           {/* Contact Form */}
           <div className="glass-card p-8">
-            <h2 className="text-2xl font-bold text-cyan-400 mb-6" data-sb-field-path="formSection.heading">Send us a Message</h2>
+            <h2 className="text-2xl font-bold text-cyan-400 mb-6">Send us a Message</h2>
             
             {submitStatus === 'success' && (
               <div className="bg-green-500/20 border border-green-500/50 rounded-lg p-4 mb-6">
@@ -120,7 +120,7 @@ function ContactUs() {
 
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
-                <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-2" data-sb-field-path="formSection.fields.nameLabel">
+                <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-2">
                   Name *
                 </label>
                 <input
@@ -136,7 +136,7 @@ function ContactUs() {
               </div>
 
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2" data-sb-field-path="formSection.fields.emailLabel">
+                <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
                   Email *
                 </label>
                 <input
@@ -152,7 +152,7 @@ function ContactUs() {
               </div>
 
               <div>
-                <label htmlFor="subject" className="block text-sm font-medium text-gray-300 mb-2" data-sb-field-path="formSection.fields.subjectLabel">
+                <label htmlFor="subject" className="block text-sm font-medium text-gray-300 mb-2">
                   Subject *
                 </label>
                 <input
@@ -168,7 +168,7 @@ function ContactUs() {
               </div>
 
               <div>
-                <label htmlFor="message" className="block text-sm font-medium text-gray-300 mb-2" data-sb-field-path="formSection.fields.messageLabel">
+                <label htmlFor="message" className="block text-sm font-medium text-gray-300 mb-2">
                   Message *
                 </label>
                 <textarea

@@ -8,7 +8,6 @@ export default defineConfig({
     exclude: ['lucide-react'],
   },
   server: {
-    allowedHosts: ['.deffatest.netlify.app'],
     hmr: {
       overlay: false
     }

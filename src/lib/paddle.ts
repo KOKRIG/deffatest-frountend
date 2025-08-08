@@ -1,4 +1,3 @@
-
 // Paddle.js Integration for DEFFATEST
 // This module handles all Paddle-related functionality including checkout and webhook verification
 
@@ -22,7 +21,7 @@ export const PADDLE_CONFIG: PaddleConfig = {
   PRO_PLAN_PRICE_ID: "pri_01jz3erkb3pft3ecw0dcz03yn2",
   CHAOS_PLAN_PRODUCT_ID: "pro_01jz3et66qhbxsxz0rm3751f8k",
   CHAOS_PLAN_PRICE_ID: "pri_01jz3ewz3rr7n92a26wf4s86ye",
-  CLIENT_SIDE_TOKEN: import.meta.env.VITE_PADDLE_CLIENT_TOKEN!,
+  CLIENT_SIDE_TOKEN: import.meta.env.VITE_PADDLE_CLIENT_TOKEN || "live_09ed53acf46a3d5e4cc657c32bf",
   WEBHOOK_SECRET_KEY: "ntfset_01jz3f3edwwmee1cd9z6gjgcr3",
   SELLER_ID: "236561" // Paddle Seller ID
 };
@@ -63,9 +62,6 @@ export interface PaddleCheckoutOptions {
     locale?: string;
   };
   transactionId?: string;
-  customData?: {
-    user_id?: string;
-  };
 }
 
 // Initialize Paddle.js with improved error handling and logging
@@ -131,7 +127,6 @@ function configurePaddle() {
     // Set environment to production first
     if (window.Paddle.Environment && typeof window.Paddle.Environment.set === 'function') {
       window.Paddle.Environment.set('production');
-      console.log('Paddle environment set to production');
     }
     
     // Initialize with Paddle Billing v2 - using token only
@@ -176,66 +171,22 @@ export const openPaddleCheckout = (options: PaddleCheckoutOptions): void => {
     }
 
     try {
-      // Ensure we have valid items
-      if (!options.items || options.items.length === 0) {
-        console.error('No items provided for checkout');
-        return;
-      }
+      // Ensure options.settings is an object, creating it if it doesn't exist
+      options.settings = options.settings || {}; 
 
-      // Validate price IDs
-      for (const item of options.items) {
-        if (!item.priceId || item.priceId.trim() === '') {
-          console.error('Invalid or empty price ID provided');
-          return;
-        }
-        if (!item.priceId.startsWith('pri_')) {
-          console.error('Invalid price ID format. Price IDs should start with \'pri_\'', item.priceId);
-          return;
-        }
-      }
+      // Remove seller from options if it exists in settings (as per your original code)
+      // This should be done AFTER ensuring options.settings is an object
+      const { seller, ...cleanSettings } = options.settings as any;
+      options.settings = cleanSettings;
 
-      // Build clean checkout options
-      const checkoutOptions: any = {
-        items: options.items
-      };
+      // Set successUrl and cancelUrl
+      const frontendBaseUrl = window.location.origin; 
 
-      // Add customer data if available
-      if (options.customer && options.customer.email) {
-        checkoutOptions.customer = {
-          email: options.customer.email
-        };
-        
-        // Only add customer ID if it's a valid string
-        if (options.customer.id && options.customer.id.trim() !== '') {
-          checkoutOptions.customer.id = options.customer.id;
-        }
-      }
-      // Add custom data for better tracking
-      if (options.customer?.id) {
-        checkoutOptions.customData = {
-          'user_id': options.customer.id
-        };
-      }
-
-      // Add settings if provided
-      if (options.settings) {
-        checkoutOptions.settings = {
-          displayMode: options.settings.displayMode || 'overlay',
-          theme: options.settings.theme || 'dark',
-          locale: options.settings.locale || 'en'
-        };
-        
-        // Add success and cancel URLs if provided
-        if (options.settings.successUrl) {
-          checkoutOptions.settings.successUrl = options.settings.successUrl;
-        }
-        if (options.settings.cancelUrl) {
-          checkoutOptions.settings.closeUrl = options.settings.cancelUrl;
-        }
-      }
+      options.settings.successUrl = `${frontendBaseUrl}/dashboard?payment=success`;
+      options.settings.cancelUrl = `${frontendBaseUrl}/dashboard?payment=cancelled`;
       
-      console.log('Opening Paddle checkout with options:', checkoutOptions);
-      window.Paddle.Checkout.open(checkoutOptions);
+      console.log('Opening Paddle checkout with options:', options);
+      window.Paddle.Checkout.open(options);
       console.log('Paddle checkout opened successfully');
     } catch (error) {
       console.error('Error opening Paddle checkout:', error);

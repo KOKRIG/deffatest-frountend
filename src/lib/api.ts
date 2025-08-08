@@ -1,21 +1,7 @@
 // API Endpoints Configuration for DEFFATEST
 // This file contains all the API endpoint definitions and helper functions
-import { supabase } from './supabase';
 
-// Pre-fetch data for faster navigation
-export const preFetchDashboardData = async () => {
-  try {
-    // Pre-fetch data for Upload page
-    await supabase.from('tests').select('*').in('status', ['queued', 'running', 'processing_results']).limit(10);
-    await supabase.from('tests').select('*', { count: 'exact' }).eq('status', 'completed').limit(10);
-
-    // Pre-fetch data for Results page
-    await supabase.from('tests').select('*', { count: 'exact' }).limit(15);
-  } catch (error) {
-    console.warn('Pre-fetching failed, but this is not critical:', error);
-  }
-};
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.deffatest.online';
 
 // API Endpoints
 export const API_ENDPOINTS = {
@@ -351,20 +337,13 @@ export class ApiClient {
     options: RequestInit = {}
   ): Promise<ApiResponse<T>> {
     const url = `${this.baseUrl}${endpoint}`;
-    
-    // FIX: Start with the headers from the specific call (e.g., submitTest)
-    const headers = new Headers(options.headers);
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    };
 
     if (this.authToken) {
-      headers.set('Authorization', `Bearer ${this.authToken}`);
-    }
-
-    // FIX: ONLY set Content-Type if the body is NOT FormData.
-    // The browser will set the correct multipart header automatically for FormData.
-    if (!(options.body instanceof FormData)) {
-      if (!headers.has('Content-Type')) {
-        headers.set('Content-Type', 'application/json');
-      }
+      headers.Authorization = `Bearer ${this.authToken}`;
     }
 
     try {
@@ -373,17 +352,13 @@ export class ApiClient {
         headers,
       });
 
-      // Handle cases with no JSON body, like a 204 No Content response
-      if (response.status === 204) {
-        return { success: true };
-      }
-
       const data = await response.json();
 
       if (!response.ok) {
-        // Use the detailed error message from FastAPI if available
-        const errorMessage = data.detail?.[0]?.msg || data.detail || data.error || `HTTP ${response.status}`;
-        return { success: false, error: errorMessage };
+        return {
+          success: false,
+          error: data.error || `HTTP ${response.status}: ${response.statusText}`,
+        };
       }
 
       return {
@@ -402,27 +377,23 @@ export class ApiClient {
   // Test Management Methods
   async submitTest(request: TestSubmissionRequest): Promise<ApiResponse<TestSubmissionResponse>> {
     const formData = new FormData();
-
-    // Use the correct backend field names that match what the backend expects
-    formData.append('test_name', request.test_name);
-    formData.append('test_type', request.test_type);
-    formData.append('requested_duration_minutes', request.requested_duration_minutes.toString());
-    formData.append('plan_type_at_submission', request.plan_type_at_submission);
+    formData.append('test_name', request.test_name); // Changed from testName
+    formData.append('test_type', request.test_type); // Changed from testType
+    formData.append('requested_duration_minutes', request.requested_duration_minutes.toString()); // Changed from duration
+    formData.append('plan_type_at_submission', request.plan_type_at_submission); // New field
     
     if (request.test_source_url) {
-      formData.append('test_source_url', request.test_source_url);
+      formData.append('test_source_url', request.test_source_url); // Changed from url
     }
     
     if (request.file) {
-      // Backend expects the file under 'uploaded_file' key, not 'file'
-      formData.append('uploaded_file', request.file);
+      formData.append('file', request.file);
     }
 
-    // FIX: The headers object is no longer needed here because the generic
-    // request function now handles it correctly.
     return this.request(API_ENDPOINTS.tests.submit, {
       method: 'POST',
       body: formData,
+      headers: {}, // Remove Content-Type to let browser set it for FormData
     });
   }
 
