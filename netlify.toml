@@ -1,0 +1,34 @@
+# Netlify Configuration
+
+[build]
+  # Build command
+  command = "npm run build"
+  
+  # Directory to publish
+  publish = "dist"
+
+[build.environment]
+  # Disable secrets scanning for specific keys that are not sensitive
+  SECRETS_SCAN_OMIT_KEYS = "VITE_API_BASE_URL"
+  
+  # Node version (optional, but good to specify)
+  NODE_VERSION = "18"
+
+# Redirect all routes to index.html for SPA
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+  
+# API proxy redirects (if needed)
+[[redirects]]
+  from = "/api/*"
+  to = "https://api.deffatest.online/api/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/paddle/*"
+  to = "https://api.deffatest.online/paddle/:splat"  
+  status = 200
+  force = true

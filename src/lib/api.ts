@@ -2,7 +2,7 @@
 // This file contains all the API endpoint definitions and helper functions
 
 // Get API URL from environment variable - required for production
-const API_BASE_URL = '/api';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.deffatest.online';
 
 
 // API Endpoints
