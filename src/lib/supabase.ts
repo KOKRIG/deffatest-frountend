@@ -1,24 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
 
-// Use environment variables - required for production
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
-
-if (!supabaseUrl || !supabaseAnonKey) {
-  console.warn('Missing environment variables: VITE_SUPABASE_URL and/or VITE_SUPABASE_ANON_KEY');
-  console.warn('Please set these variables in your .env file or Netlify environment settings');
-}
 
 // Create client only if we have valid credentials
-export const supabase = (supabaseUrl && supabaseAnonKey) 
-  ? createClient(supabaseUrl, supabaseAnonKey, {
-    auth: {
-      persistSession: true,
-      autoRefreshToken: true,
-      detectSessionInUrl: true
-    }
-  })
-  : null as any; // Fallback for when credentials are missing
+export const supabase = null as any; // Fallback for when credentials are missing
 
 // Types
 export interface Profile {

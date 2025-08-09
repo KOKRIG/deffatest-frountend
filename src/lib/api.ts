@@ -2,12 +2,8 @@
 // This file contains all the API endpoint definitions and helper functions
 
 // Get API URL from environment variable - required for production
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
+const API_BASE_URL = '/api';
 
-if (!API_BASE_URL) {
-  console.warn('Missing environment variable: VITE_API_BASE_URL');
-  console.warn('API calls will not work without this URL. Please set it in Netlify environment settings.');
-}
 
 // API Endpoints
 export const API_ENDPOINTS = {
