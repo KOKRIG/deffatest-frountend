@@ -1,7 +1,13 @@
 // API Endpoints Configuration for DEFFATEST
 // This file contains all the API endpoint definitions and helper functions
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.deffatest.online';
+// Get API URL from environment variable - required for production
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
+
+if (!API_BASE_URL) {
+  console.warn('Missing environment variable: VITE_API_BASE_URL');
+  console.warn('API calls will not work without this URL. Please set it in Netlify environment settings.');
+}
 
 // API Endpoints
 export const API_ENDPOINTS = {

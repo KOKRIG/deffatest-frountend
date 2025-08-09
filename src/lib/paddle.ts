@@ -13,6 +13,14 @@ export interface PaddleConfig {
   SELLER_ID: string;
 }
 
+// Get client token from environment variable - required for production
+const paddleClientToken = import.meta.env.VITE_PADDLE_CLIENT_TOKEN || '';
+
+if (!paddleClientToken) {
+  console.warn('Missing environment variable: VITE_PADDLE_CLIENT_TOKEN');
+  console.warn('Paddle checkout will not work without this token. Please set it in Netlify environment settings.');
+}
+
 export const PADDLE_CONFIG: PaddleConfig = {
   // Using the exact product IDs and price IDs you provided
   FREE_PLAN_PRODUCT_ID: "pro_01jz3ee4whjwf0bsb0n0k779pw",
@@ -21,7 +29,7 @@ export const PADDLE_CONFIG: PaddleConfig = {
   PRO_PLAN_PRICE_ID: "pri_01jz3erkb3pft3ecw0dcz03yn2",
   CHAOS_PLAN_PRODUCT_ID: "pro_01jz3et66qhbxsxz0rm3751f8k",
   CHAOS_PLAN_PRICE_ID: "pri_01jz3ewz3rr7n92a26wf4s86ye",
-  CLIENT_SIDE_TOKEN: import.meta.env.VITE_PADDLE_CLIENT_TOKEN || "live_09ed53acf46a3d5e4cc657c32bf",
+  CLIENT_SIDE_TOKEN: paddleClientToken,
   WEBHOOK_SECRET_KEY: "ntfset_01jz3f3edwwmee1cd9z6gjgcr3",
   SELLER_ID: "236561" // Paddle Seller ID
 };
@@ -131,12 +139,18 @@ function configurePaddle() {
     
     // Initialize with Paddle Billing v2 - using token only
     if (typeof window.Paddle.Initialize === 'function') {
-      window.Paddle.Initialize({
-        token: PADDLE_CONFIG.CLIENT_SIDE_TOKEN,
-        eventCallback: (data: any) => {
-          console.log('Paddle.js event:', data);
-        }
-      });
+      // Only initialize if we have a valid token
+      if (PADDLE_CONFIG.CLIENT_SIDE_TOKEN) {
+        window.Paddle.Initialize({
+          token: PADDLE_CONFIG.CLIENT_SIDE_TOKEN,
+          eventCallback: (data: any) => {
+            console.log('Paddle.js event:', data);
+          }
+        });
+      } else {
+        console.error('Cannot initialize Paddle: Missing client token');
+        return;
+      }
       
       console.log('Paddle initialized with token in production environment');
     } else {

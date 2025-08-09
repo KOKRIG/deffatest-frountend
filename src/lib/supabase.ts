@@ -1,16 +1,24 @@
 import { createClient } from '@supabase/supabase-js';
 
-// Use environment variables with fallback for development
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://njtxcvonqdpsmjsczbbd.supabase.co';
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5qdHhjdm9ucWRwc21qc2N6YmJkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA5MzA2ODUsImV4cCI6MjA2NjUwNjY4NX0.SprNvNa-_A3-2AoWPdJqPsMPB7G2pjrVTbEPgGJxePY';
+// Use environment variables - required for production
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    persistSession: true,
-    autoRefreshToken: true,
-    detectSessionInUrl: true
-  }
-});
+if (!supabaseUrl || !supabaseAnonKey) {
+  console.warn('Missing environment variables: VITE_SUPABASE_URL and/or VITE_SUPABASE_ANON_KEY');
+  console.warn('Please set these variables in your .env file or Netlify environment settings');
+}
+
+// Create client only if we have valid credentials
+export const supabase = (supabaseUrl && supabaseAnonKey) 
+  ? createClient(supabaseUrl, supabaseAnonKey, {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: true
+    }
+  })
+  : null as any; // Fallback for when credentials are missing
 
 // Types
 export interface Profile {
