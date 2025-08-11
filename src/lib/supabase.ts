@@ -1,7 +1,19 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+// Get environment variables and clean them
+let supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+let supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+// Clean the URL: remove trailing spaces, commas, and any whitespace
+if (supabaseUrl) {
+  supabaseUrl = supabaseUrl.trim().replace(/[,\s]+$/, '');
+  console.log('Supabase URL after cleaning:', supabaseUrl);
+}
+
+// Clean the anon key as well
+if (supabaseAnonKey) {
+  supabaseAnonKey = supabaseAnonKey.trim();
+}
 
 // Check if we have the required environment variables
 if (!supabaseUrl || !supabaseAnonKey) {

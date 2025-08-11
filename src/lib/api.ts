@@ -1,8 +1,12 @@
 // API Endpoints Configuration for DEFFATEST
 // This file contains all the API endpoint definitions and helper functions
 
-// Get API URL from environment variable - required for production
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.deffatest.online';
+// Get API URL from environment variable and clean it
+let apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'https://api.deffatest.online';
+if (apiBaseUrl) {
+  apiBaseUrl = apiBaseUrl.trim().replace(/[,\s]+$/, '');
+}
+const API_BASE_URL = apiBaseUrl;
 
 
 // API Endpoints

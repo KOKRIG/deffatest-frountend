@@ -13,6 +13,12 @@ export interface PaddleConfig {
   SELLER_ID: string;
 }
 
+// Get Paddle token from environment variable and clean it
+let paddleToken = import.meta.env.VITE_PADDLE_CLIENT_TOKEN || "";
+if (paddleToken) {
+  paddleToken = paddleToken.trim().replace(/[,\s]+$/, '');
+}
+
 export const PADDLE_CONFIG: PaddleConfig = {
   // Using the exact product IDs and price IDs you provided
   FREE_PLAN_PRODUCT_ID: "pro_01jz3ee4whjwf0bsb0n0k779pw",
@@ -21,7 +27,7 @@ export const PADDLE_CONFIG: PaddleConfig = {
   PRO_PLAN_PRICE_ID: "pri_01jz3erkb3pft3ecw0dcz03yn2",
   CHAOS_PLAN_PRODUCT_ID: "pro_01jz3et66qhbxsxz0rm3751f8k",
   CHAOS_PLAN_PRICE_ID: "pri_01jz3ewz3rr7n92a26wf4s86ye",
-  CLIENT_SIDE_TOKEN: import.meta.env.VITE_PADDLE_CLIENT_TOKEN || "",
+  CLIENT_SIDE_TOKEN: paddleToken,
   WEBHOOK_SECRET_KEY: "ntfset_01jz3f3edwwmee1cd9z6gjgcr3",
   SELLER_ID: "236561" // Paddle Seller ID
 };
