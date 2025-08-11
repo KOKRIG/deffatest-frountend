@@ -8,8 +8,9 @@
   publish = "dist"
 
 [build.environment]
-  # Disable secrets scanning for specific keys that are not sensitive
-  SECRETS_SCAN_OMIT_KEYS = "VITE_API_BASE_URL"
+  # Disable secrets scanning for VITE variables (they are meant to be public)
+  # These are frontend environment variables that get bundled into the client code
+  SECRETS_SCAN_OMIT_KEYS = "VITE_API_BASE_URL,VITE_SUPABASE_URL,VITE_SUPABASE_ANON_KEY,VITE_PADDLE_CLIENT_TOKEN"
   
   # Node version (optional, but good to specify)
   NODE_VERSION = "18"
