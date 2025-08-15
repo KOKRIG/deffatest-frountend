@@ -91,8 +91,13 @@ function DashboardPricing() {
           displayMode: 'overlay' as const,
           theme: 'dark' as const,
           locale: 'en',
-          successUrl: `${window.location.origin}/dashboard/pricing?payment=success`,
-          cancelUrl: `${window.location.origin}/dashboard/pricing?payment=cancelled`
+          variant: 'multi-page' as const,
+          allowLogout: true,
+          showAddDiscounts: true,
+          showAddTaxId: true,
+          allowDiscountRemoval: true,
+          successUrl: `${window.location.origin}/dashboard?payment=success`,
+          cancelUrl: `${window.location.origin}/dashboard?payment=cancelled`
         }
       };
       

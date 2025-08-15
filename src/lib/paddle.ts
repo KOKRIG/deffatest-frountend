@@ -66,6 +66,11 @@ export interface PaddleCheckoutOptions {
     displayMode?: 'overlay' | 'redirect';
     theme?: 'dark' | 'light';
     locale?: string;
+    variant?: 'multi-page' | 'one-page';
+    allowLogout?: boolean;
+    showAddDiscounts?: boolean;
+    showAddTaxId?: boolean;
+    allowDiscountRemoval?: boolean;
   };
   transactionId?: string;
 }
@@ -183,20 +188,8 @@ export const openPaddleCheckout = (options: PaddleCheckoutOptions): void => {
     }
 
     try {
-      // Ensure options.settings is an object, creating it if it doesn't exist
-      options.settings = options.settings || {}; 
-
-      // Remove seller from options if it exists in settings (as per your original code)
-      // This should be done AFTER ensuring options.settings is an object
-      const { seller, ...cleanSettings } = options.settings as any;
-      options.settings = cleanSettings;
-
-      // Set successUrl and cancelUrl
-      const frontendBaseUrl = window.location.origin; 
-
-      options.settings.successUrl = `${frontendBaseUrl}/dashboard?payment=success`;
-      options.settings.cancelUrl = `${frontendBaseUrl}/dashboard?payment=cancelled`;
-      
+      // Don't override settings that are already set in the options
+      // Just pass them through as-is
       console.log('Opening Paddle checkout with options:', options);
       window.Paddle.Checkout.open(options);
       console.log('Paddle checkout opened successfully');
