@@ -26,7 +26,7 @@ import ScrollToTop from './components/ScrollToTop.tsx';
 import ProtectedRoute from './components/ProtectedRoute.tsx';
 import LoadingScreen from './components/LoadingScreen.tsx';
 import { AuthProvider } from './contexts/AuthContext.tsx';
-import { initializePaddle } from './lib/paddle.ts';
+import { initializePaddle } from './lib/paddle.js';
 import './index.css';
 
 // Preload the logo image first with robust handling

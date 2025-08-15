@@ -11,7 +11,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 // V-- THIS LINE IS NOW FIXED --V
-import { initializePaddle, openPaddleCheckout, PADDLE_CONFIG, PLAN_CONFIG } from '../lib/paddle';
+import { initializePaddle, openPaddleCheckout, PADDLE_CONFIG, PLAN_CONFIG } from '../lib/paddle.js';
 import Layout from '../components/Layout';
 
 function Pricing() {

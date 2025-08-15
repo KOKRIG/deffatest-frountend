@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Crown, Zap, Rocket, AlertCircle, CheckCircle } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import { initializePaddle, openPaddleCheckout, PADDLE_CONFIG, PLAN_CONFIG } from '../lib/paddle';
+import { initializePaddle, openPaddleCheckout, PADDLE_CONFIG, PLAN_CONFIG } from '../lib/paddle.js';
 import DashboardLayout from '../components/dashboard/DashboardLayout';
 
 function DashboardPricing() {
@@ -77,6 +77,9 @@ function DashboardPricing() {
       // Wait longer for Paddle to be ready
       await new Promise(resolve => setTimeout(resolve, 1000));
       
+      // Build checkout configuration with proper URL formatting
+      const baseUrl = window.location.origin;
+      
       const checkoutConfig = {
         items: [
           {
@@ -88,16 +91,12 @@ function DashboardPricing() {
           email: user.email || ''
         },
         settings: {
-          displayMode: 'overlay' as const,
-          theme: 'dark' as const,
+          displayMode: 'overlay',
+          theme: 'dark',
           locale: 'en',
-          variant: 'multi-page' as const,
-          allowLogout: true,
-          showAddDiscounts: true,
-          showAddTaxId: true,
-          allowDiscountRemoval: true,
-          successUrl: `${window.location.origin}/dashboard?payment=success`,
-          cancelUrl: `${window.location.origin}/dashboard?payment=cancelled`
+          variant: 'one-page',  // Change to one-page for simpler checkout
+          successUrl: baseUrl + '/dashboard?payment=success',
+          cancelUrl: baseUrl + '/dashboard?payment=cancelled'
         }
       };
       

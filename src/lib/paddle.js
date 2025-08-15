@@ -1,25 +1,13 @@
 // Paddle.js Integration for DEFFATEST
 // This module handles all Paddle-related functionality including checkout and webhook verification
 
-export interface PaddleConfig {
-  FREE_PLAN_PRODUCT_ID: string;
-  PRO_PLAN_PRODUCT_ID: string;
-  CHAOS_PLAN_PRODUCT_ID: string;
-  FREE_PLAN_PRICE_ID: string;
-  PRO_PLAN_PRICE_ID: string;
-  CHAOS_PLAN_PRICE_ID: string;
-  CLIENT_SIDE_TOKEN: string;
-  WEBHOOK_SECRET_KEY: string;
-  SELLER_ID: string;
-}
-
 // Get Paddle token from environment variable and clean it
 let paddleToken = import.meta.env.VITE_PADDLE_CLIENT_TOKEN || "";
 if (paddleToken) {
   paddleToken = paddleToken.trim().replace(/[,\s]+$/, '');
 }
 
-export const PADDLE_CONFIG: PaddleConfig = {
+export const PADDLE_CONFIG = {
   // Using the exact product IDs and price IDs you provided
   FREE_PLAN_PRODUCT_ID: "pro_01jz3ee4whjwf0bsb0n0k779pw",
   FREE_PLAN_PRICE_ID: "pri_01jz3ekbgqj5m5aese86kwpfxp",
@@ -32,51 +20,8 @@ export const PADDLE_CONFIG: PaddleConfig = {
   SELLER_ID: "236561" // Paddle Seller ID
 };
 
-// Declare Paddle types for TypeScript
-declare global {
-  interface Window {
-    Paddle?: {
-      // Paddle Billing (v2) methods
-      Initialize: (options: { 
-        token: string;
-        eventCallback?: (data: any) => void;
-      }) => void;
-      Checkout: {
-        open: (options: PaddleCheckoutOptions) => void;
-      };
-      Environment?: {
-        set: (environment: 'sandbox' | 'production') => void;
-      };
-    };
-  }
-}
-
-export interface PaddleCheckoutOptions {
-  items: Array<{
-    priceId: string;
-    quantity: number;
-  }>;
-  customer?: {
-    email?: string;
-    id?: string;
-  };
-  settings?: {
-    successUrl?: string;
-    cancelUrl?: string;
-    displayMode?: 'overlay' | 'redirect';
-    theme?: 'dark' | 'light';
-    locale?: string;
-    variant?: 'multi-page' | 'one-page';
-    allowLogout?: boolean;
-    showAddDiscounts?: boolean;
-    showAddTaxId?: boolean;
-    allowDiscountRemoval?: boolean;
-  };
-  transactionId?: string;
-}
-
 // Initialize Paddle.js with improved error handling and logging
-export const initializePaddle = async (): Promise<void> => {
+export const initializePaddle = async () => {
   return new Promise((resolve, reject) => {
     // Make sure we're in the browser
     if (typeof window === 'undefined') {
@@ -146,7 +91,7 @@ function configurePaddle() {
       if (PADDLE_CONFIG.CLIENT_SIDE_TOKEN) {
         window.Paddle.Initialize({
           token: PADDLE_CONFIG.CLIENT_SIDE_TOKEN,
-          eventCallback: (data: any) => {
+          eventCallback: (data) => {
             console.log('Paddle.js event:', data);
           }
         });
@@ -165,7 +110,7 @@ function configurePaddle() {
 }
 
 // Open Paddle checkout with improved error handling
-export const openPaddleCheckout = (options: PaddleCheckoutOptions): void => {
+export const openPaddleCheckout = (options) => {
   if (typeof window === 'undefined') {
     console.error('Paddle checkout can only be opened in browser environment');
     return;
@@ -188,10 +133,50 @@ export const openPaddleCheckout = (options: PaddleCheckoutOptions): void => {
     }
 
     try {
-      // Don't override settings that are already set in the options
-      // Just pass them through as-is
-      console.log('Opening Paddle checkout with options:', options);
-      window.Paddle.Checkout.open(options);
+      // Build the checkout configuration properly for Paddle Billing v2
+      const checkoutConfig = {
+        items: options.items || [],
+      };
+
+      // Add customer data if available
+      if (options.customer) {
+        checkoutConfig.customer = options.customer;
+      }
+
+      // Build settings with proper formatting
+      if (options.settings) {
+        checkoutConfig.settings = {
+          displayMode: options.settings.displayMode || 'overlay',
+          theme: options.settings.theme || 'dark',
+          locale: options.settings.locale || 'en',
+          variant: options.settings.variant || 'one-page',
+        };
+
+        // Add success and cancel URLs if provided
+        if (options.settings.successUrl) {
+          checkoutConfig.settings.successUrl = options.settings.successUrl;
+        }
+        if (options.settings.cancelUrl) {
+          checkoutConfig.settings.cancelUrl = options.settings.cancelUrl;
+        }
+
+        // Add additional settings
+        if (options.settings.allowLogout !== undefined) {
+          checkoutConfig.settings.allowLogout = options.settings.allowLogout;
+        }
+        if (options.settings.showAddDiscounts !== undefined) {
+          checkoutConfig.settings.showAddDiscounts = options.settings.showAddDiscounts;
+        }
+        if (options.settings.showAddTaxId !== undefined) {
+          checkoutConfig.settings.showAddTaxId = options.settings.showAddTaxId;
+        }
+        if (options.settings.allowDiscountRemoval !== undefined) {
+          checkoutConfig.settings.allowDiscountRemoval = options.settings.allowDiscountRemoval;
+        }
+      }
+
+      console.log('Opening Paddle checkout with config:', checkoutConfig);
+      window.Paddle.Checkout.open(checkoutConfig);
       console.log('Paddle checkout opened successfully');
     } catch (error) {
       console.error('Error opening Paddle checkout:', error);
@@ -200,7 +185,7 @@ export const openPaddleCheckout = (options: PaddleCheckoutOptions): void => {
 };
 
 // Get product ID for plan type
-export const getProductIdForPlan = (planType: string): string => {
+export const getProductIdForPlan = (planType) => {
   switch (planType) {
     case 'free':
       return PADDLE_CONFIG.FREE_PLAN_PRODUCT_ID;
@@ -214,7 +199,7 @@ export const getProductIdForPlan = (planType: string): string => {
 };
 
 // Get price ID for plan type
-export const getPriceIdForPlan = (planType: string): string => {
+export const getPriceIdForPlan = (planType) => {
   switch (planType) {
     case 'free':
       return PADDLE_CONFIG.FREE_PLAN_PRICE_ID;
