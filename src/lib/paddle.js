@@ -149,7 +149,7 @@ export const openPaddleCheckout = (options) => {
           displayMode: options.settings.displayMode || 'overlay',
           theme: options.settings.theme || 'dark',
           locale: options.settings.locale || 'en',
-          variant: options.settings.variant || 'one-page',
+          variant: options.settings.variant || 'multi-page',
         };
 
         // Add success and cancel URLs if provided

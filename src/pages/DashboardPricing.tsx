@@ -78,7 +78,8 @@ function DashboardPricing() {
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       // Build checkout configuration with proper URL formatting
-      const baseUrl = window.location.origin;
+      // Use the approved domain from Paddle configuration
+      const baseUrl = 'https://deffatest.online';
       
       const checkoutConfig = {
         items: [
@@ -94,9 +95,13 @@ function DashboardPricing() {
           displayMode: 'overlay',
           theme: 'dark',
           locale: 'en',
-          variant: 'one-page',  // Change to one-page for simpler checkout
-          successUrl: baseUrl + '/dashboard?payment=success',
-          cancelUrl: baseUrl + '/dashboard?payment=cancelled'
+          variant: 'multi-page',  // Use multi-page as that's what worked in your network logs
+          successUrl: `${baseUrl}/dashboard`,
+          cancelUrl: `${baseUrl}/dashboard/pricing`,
+          allowLogout: true,
+          showAddDiscounts: true,
+          showAddTaxId: true,
+          allowDiscountRemoval: true
         }
       };
       
