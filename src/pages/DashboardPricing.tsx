@@ -97,7 +97,7 @@ function DashboardPricing() {
           locale: 'en',
           variant: 'multi-page',  // Use multi-page as that's what worked in your network logs
           successUrl: `${baseUrl}/dashboard`,
-          cancelUrl: `${baseUrl}/dashboard/pricing`,
+          // Intentionally omit cancelUrl to avoid Paddle validation.no_validation_set
           allowLogout: true,
           showAddDiscounts: true,
           showAddTaxId: true,

@@ -93,6 +93,19 @@ function configurePaddle() {
           token: PADDLE_CONFIG.CLIENT_SIDE_TOKEN,
           eventCallback: (data) => {
             console.log('Paddle.js event:', data);
+            try {
+              // Handle checkout completion and cancellation without needing cancelUrl
+              if (data?.name === 'checkout.completed') {
+                // On success, send user to dashboard
+                window.location.assign('https://deffatest.online/dashboard');
+              }
+              if (data?.name === 'checkout.closed') {
+                // User closed/cancelled checkout, return to pricing
+                window.location.assign('https://deffatest.online/dashboard/pricing');
+              }
+            } catch (e) {
+              console.warn('Paddle event handler error:', e);
+            }
           }
         });
       } else {
@@ -156,9 +169,7 @@ export const openPaddleCheckout = (options) => {
         if (options.settings.successUrl) {
           checkoutConfig.settings.successUrl = options.settings.successUrl;
         }
-        if (options.settings.cancelUrl) {
-          checkoutConfig.settings.cancelUrl = options.settings.cancelUrl;
-        }
+        // Do NOT set cancelUrl to avoid Paddle cancel_url validation when no validation set exists
 
         // Add additional settings
         if (options.settings.allowLogout !== undefined) {
