@@ -235,21 +235,22 @@ function Results() {
     setDownloadingTests(prev => new Set(prev).add(testId));
     
     try {
-      // Mock download - in production, this would use the actual report_download_link from Cloudflare R2
-      const mockDownloadUrl = `https://mock-r2-domain.r2.cloudflarestorage.com/${testId}/full_report.zip`;
-      
+      // Find the test object from our tests array
+      const test = tests.find(t => t.id === testId);
+      const downloadUrl = test?.report_download_url; // Use the actual download URL from the test object
+
+      if (!downloadUrl) {
+        console.error('No download URL available for this test.');
+        return;
+      }
+
       // Create a temporary link and trigger download
       const link = document.createElement('a');
-      link.href = mockDownloadUrl;
+      link.href = downloadUrl;
       link.download = `${testName.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_report.zip`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      
-      // In production, you would make an API call to get the actual download link:
-      // const response = await fetch(`/api/tests/${testId}/download`);
-      // const { download_url } = await response.json();
-      // window.open(download_url, '_blank');
       
     } catch (error) {
       console.error('Error downloading report:', error);
@@ -272,7 +273,7 @@ function Results() {
         return <Play className="w-5 h-5 text-blue-400" />;
       case 'failed':
         return <XCircle className="w-5 h-5 text-red-400" />;
-      case 'pending':
+      case 'queued':
         return <Clock className="w-5 h-5 text-yellow-400" />;
       case 'processing_results':
         return <Settings className="w-5 h-5 text-cyan-400 animate-spin" />;
@@ -291,7 +292,7 @@ function Results() {
         return 'text-blue-400';
       case 'failed':
         return 'text-red-400';
-      case 'pending':
+      case 'queued':
         return 'text-yellow-400';
       case 'processing_results':
         return 'text-cyan-400';
@@ -310,7 +311,7 @@ function Results() {
         return 'shadow-blue-500/20 animate-pulse border-blue-500/20';
       case 'failed':
         return 'shadow-red-500/20 border-red-500/20';
-      case 'pending':
+      case 'queued':
         return 'shadow-yellow-500/20 border-yellow-500/20';
       case 'processing_results':
         return 'shadow-cyan-500/20 border-cyan-500/20';
@@ -331,9 +332,8 @@ function Results() {
     });
   };
 
-  const formatDuration = (config: any) => {
-    if (!config?.duration) return 'N/A';
-    const minutes = parseInt(config.duration);
+  const formatDuration = (minutes: number) => {
+    if (!minutes) return 'N/A';
     if (minutes < 60) return `${minutes} min`;
     const hours = Math.floor(minutes / 60);
     const remainingMinutes = minutes % 60;
@@ -341,10 +341,16 @@ function Results() {
   };
 
   const getTestTypeLabel = (test: Test) => {
-    if (test.test_type === 'web') {
-      return test.app_url ? 'Web (URL)' : 'Web (Bundle)';
+    switch(test.test_type) {
+      case 'web_url':
+        return 'Web (URL)';
+      case 'web_bundle':
+        return 'Web (Bundle)';
+      case 'android_apk':
+        return 'Android APK';
+      default:
+        return test.test_type;
     }
-    return 'Android APK';
   };
 
   const canViewReport = (status: string) => {
@@ -363,7 +369,7 @@ function Results() {
 
   const getInProgressMessage = (status: string) => {
     switch (status) {
-      case 'pending':
+      case 'queued':
         return 'The test is currently queued. It will be available shortly.';
       case 'running':
         return 'The test is currently running. It will be available shortly.';
@@ -531,7 +537,7 @@ function Results() {
                   className="w-full px-3 py-2 bg-black/50 border border-purple-500/30 rounded-lg text-white focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 transition-colors"
                 >
                   <option value="all">All Statuses</option>
-                  <option value="pending">Queued</option>
+                  <option value="queued">Queued</option>
                   <option value="running">Running</option>
                   <option value="processing_results">Processing Results</option>
                   <option value="completed">Completed</option>
@@ -611,7 +617,7 @@ function Results() {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-4 flex-1">
                         <div className="w-12 h-12 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-lg flex items-center justify-center">
-                          {test.test_type === 'web' ? (
+                          {test.test_type.startsWith('web') ? (
                             <Globe className="w-6 h-6 text-white" />
                           ) : (
                             <Smartphone className="w-6 h-6 text-white" />
@@ -622,8 +628,8 @@ function Results() {
                           <div className="flex items-center space-x-4 text-sm text-gray-400">
                             <span>ID: {test.id.slice(0, 8)}...</span>
                             <span>{getTestTypeLabel(test)}</span>
-                            <span>{formatDate(test.created_at)}</span>
-                            <span>Duration: {formatDuration(test.config)}</span>
+                            <span>{formatDate(test.submitted_at)}</span>
+                            <span>Duration: {formatDuration(test.requested_duration_minutes)}</span>
                           </div>
                           {!canViewReport(test.status) && (
                             <p className="text-sm text-yellow-400 mt-1">
