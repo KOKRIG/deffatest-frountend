@@ -467,7 +467,6 @@ export class ApiClient {
   async getPaddlePortalLink(): Promise<ApiResponse<{ url: string }>> {
     return this.request(API_ENDPOINTS.user.paddlePortalLink);
   }
-  }
 
   async getDashboardSummary(): Promise<ApiResponse<DashboardSummaryResponse>> {
     return this.request(API_ENDPOINTS.tests.summary);
