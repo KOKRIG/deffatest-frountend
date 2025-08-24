@@ -23,6 +23,58 @@ export function useAuth() {
   return context;
 }
 
+// Profile cache to avoid repeated fetches
+const PROFILE_CACHE_KEY = 'deffatest_profile_cache';
+const PROFILE_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
+interface ProfileCache {
+  profile: Profile;
+  timestamp: number;
+  userId: string;
+}
+
+const getProfileFromCache = (userId: string): Profile | null => {
+  try {
+    const cached = localStorage.getItem(PROFILE_CACHE_KEY);
+    if (!cached) return null;
+    
+    const cacheData: ProfileCache = JSON.parse(cached);
+    const now = Date.now();
+    
+    // Check if cache is valid (not expired and for same user)
+    if (cacheData.userId === userId && (now - cacheData.timestamp) < PROFILE_CACHE_TTL) {
+      console.log('Profile loaded from cache');
+      return cacheData.profile;
+    }
+    
+    // Clear expired cache
+    localStorage.removeItem(PROFILE_CACHE_KEY);
+    return null;
+  } catch (error) {
+    console.warn('Error reading profile cache:', error);
+    localStorage.removeItem(PROFILE_CACHE_KEY);
+    return null;
+  }
+};
+
+const setProfileToCache = (userId: string, profile: Profile): void => {
+  try {
+    const cacheData: ProfileCache = {
+      profile,
+      timestamp: Date.now(),
+      userId
+    };
+    localStorage.setItem(PROFILE_CACHE_KEY, JSON.stringify(cacheData));
+    console.log('Profile cached successfully');
+  } catch (error) {
+    console.warn('Error caching profile:', error);
+  }
+};
+
+const clearProfileCache = (): void => {
+  localStorage.removeItem(PROFILE_CACHE_KEY);
+};
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -123,11 +175,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const fetchProfile = async (userId: string) => {
     try {
       console.log('Fetching profile for user:', userId);
+      
+      // Try to get profile from cache first
+      const cachedProfile = getProfileFromCache(userId);
+      if (cachedProfile) {
+        setProfile(cachedProfile);
+        setLoading(false);
+        setProfileFetchAttempts(0);
+        return;
+      }
+      
       setProfileFetchAttempts(prev => prev + 1);
       
-      // Set a timeout for the profile fetch
+      // Reduce timeout to 5 seconds for faster fallback
       const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Profile fetch timeout')), 10000)
+        setTimeout(() => reject(new Error('Profile fetch timeout')), 5000)
       );
       
       const profilePromise = supabase
@@ -149,6 +211,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (existingProfile) {
         console.log('Profile found:', existingProfile);
         setProfile(existingProfile);
+        setProfileToCache(userId, existingProfile); // Cache the profile
         setLoading(false);
         setProfileFetchAttempts(0);
         return;
@@ -161,22 +224,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } catch (error) {
       console.error('Error in fetchProfile:', error);
       
-      if (profileFetchAttempts >= 3) {
-        console.error('Max profile fetch attempts reached, continuing without profile');
+      if (profileFetchAttempts >= 2) { // Reduced attempts for faster fallback
+        console.error('Max profile fetch attempts reached, using fallback profile');
         // Create a minimal profile to prevent infinite loading
         const fallbackProfile: Profile = {
           user_id: userId,
           email: user?.email || '',
           full_name: user?.user_metadata?.full_name || '',
-          company_name: '', // Using company_name instead of company
+          company_name: '', 
           industry: 'Other',
-          plan_type: 'free', // Using plan_type instead of subscription_plan
+          plan_type: 'free',
           subscription_status: 'FREE',
           tests_this_month_count: 0,
           concurrent_test_slots: 1,
           created_at: new Date().toISOString()
         };
         setProfile(fallbackProfile);
+        setProfileToCache(userId, fallbackProfile); // Cache fallback profile too
         setLoading(false);
       }
     }
@@ -317,11 +381,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
       
-      // Clear local state
+      // Clear local state and cache
       setUser(null);
       setProfile(null);
       setSession(null);
       setProfileFetchAttempts(0);
+      clearProfileCache(); // Clear cached profile data
       
     } catch (error) {
       console.error('Error signing out:', error);

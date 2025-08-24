@@ -383,6 +383,17 @@ export class ApiClient {
   // Test Management Methods
   async submitTest(request: TestSubmissionRequest): Promise<ApiResponse<TestSubmissionResponse>> {
     const formData = new FormData();
+    
+    // Debug: Log all form data before sending
+    console.log('Submitting test with data:', {
+      test_name: request.test_name,
+      test_type: request.test_type,
+      requested_duration_minutes: request.requested_duration_minutes,
+      plan_type_at_submission: request.plan_type_at_submission,
+      test_source_url: request.test_source_url,
+      hasFile: !!request.file
+    });
+    
     formData.append('test_name', request.test_name);
     formData.append('test_type', request.test_type);
     formData.append('requested_duration_minutes', request.requested_duration_minutes.toString());
@@ -393,7 +404,13 @@ export class ApiClient {
     }
     
     if (request.file) {
-      formData.append('uploaded_file', request.file); // Match backend parameter name
+      formData.append('uploaded_file', request.file);
+    }
+
+    // Debug: Log FormData contents
+    console.log('FormData contents:');
+    for (const [key, value] of formData.entries()) {
+      console.log(`${key}:`, value);
     }
 
     return this.request(API_ENDPOINTS.tests.submit, {
