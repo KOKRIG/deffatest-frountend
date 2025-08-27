@@ -344,9 +344,13 @@ export class ApiClient {
   ): Promise<ApiResponse<T>> {
     const url = `${this.baseUrl}${endpoint}`;
     const headers: HeadersInit = {
-      'Content-Type': 'application/json',
       ...options.headers,
     };
+
+    // Only set Content-Type if not FormData (browser sets it automatically for FormData)
+    if (!(options.body instanceof FormData)) {
+      headers['Content-Type'] = 'application/json';
+    }
 
     if (this.authToken) {
       headers.Authorization = `Bearer ${this.authToken}`;
@@ -416,7 +420,7 @@ export class ApiClient {
     return this.request(API_ENDPOINTS.tests.submit, {
       method: 'POST',
       body: formData,
-      headers: {}, // Remove Content-Type to let browser set it for FormData
+      // No need to set headers, the request method will handle it properly now
     });
   }
 

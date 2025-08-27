@@ -1,42 +1,8 @@
-import React, { useState } from 'react';
-import { Mail, Send, CheckCircle, AlertCircle } from 'lucide-react';
+import React from 'react';
+import { Mail, Send, CheckCircle, AlertCircle, Users, Briefcase } from 'lucide-react';
 import Layout from '../components/Layout';
 
 function ContactUs() {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    subject: '',
-    message: ''
-  });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    
-    // Simulate form submission (replace with actual backend call)
-    try {
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      setSubmitStatus('success');
-      setFormData({ name: '', email: '', subject: '', message: '' });
-    } catch (error) {
-      setSubmitStatus('error');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const isFormValid = formData.name && formData.email && formData.subject && formData.message;
 
   return (
     <Layout title="Get In Touch">
@@ -98,109 +64,49 @@ function ContactUs() {
           <div className="glass-card p-8">
             <h2 className="text-2xl font-bold text-cyan-400 mb-6">Send us a Message</h2>
             
-            {submitStatus === 'success' && (
-              <div className="bg-green-500/20 border border-green-500/50 rounded-lg p-4 mb-6">
-                <div className="flex items-center">
-                  <CheckCircle className="w-5 h-5 text-green-400 mr-2" />
-                  <p className="text-green-300 font-semibold">Message sent successfully!</p>
-                </div>
-                <p className="text-green-200 text-sm mt-1">We'll get back to you shortly.</p>
-              </div>
-            )}
+            <p className="text-gray-300 leading-relaxed mb-6">
+              Use the form below to get in touch with us. We'll respond as soon as possible!
+            </p>
+            
+            <div className="bg-gradient-to-r from-cyan-500/10 to-purple-500/10 border border-cyan-500/30 rounded-lg p-4 mb-6">
+              <p className="text-center text-cyan-300 font-medium">
+                💬 Have a question? We're here to help!
+              </p>
+            </div>
 
-            {submitStatus === 'error' && (
-              <div className="bg-red-500/20 border border-red-500/50 rounded-lg p-4 mb-6">
-                <div className="flex items-center">
-                  <AlertCircle className="w-5 h-5 text-red-400 mr-2" />
-                  <p className="text-red-300 font-semibold">Failed to send message.</p>
-                </div>
-                <p className="text-red-200 text-sm mt-1">Please try again or contact us directly via email.</p>
+            {/* Google Form Embed */}
+            <div className="relative">
+              <div className="bg-black/30 rounded-lg overflow-hidden border border-purple-500/30">
+                <iframe 
+                  src="https://docs.google.com/forms/d/e/1FAIpQLSdo8qQwy85Lyy85m5kGuPg87Tha5wxkKSf0RRPHL6zLKAMrGw/viewform?embedded=true&usp=pp_url"
+                  width="100%" 
+                  height="700" 
+                  frameBorder="0" 
+                  marginHeight={0} 
+                  marginWidth={0}
+                  className="w-full"
+                  title="Contact Form"
+                >
+                  Loading…
+                </iframe>
               </div>
-            )}
-
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div>
-                <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-2">
-                  Name *
-                </label>
-                <input
-                  type="text"
-                  id="name"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleInputChange}
-                  required
-                  className="w-full px-4 py-3 bg-black/50 border border-purple-500/30 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 transition-colors"
-                  placeholder="Your full name"
-                />
+              
+              {/* Fallback link */}
+              <div className="text-center mt-4">
+                <p className="text-sm text-gray-400 mb-2">
+                  Having trouble with the form above?
+                </p>
+                <a 
+                  href="https://docs.google.com/forms/d/e/1FAIpQLSdo8qQwy85Lyy85m5kGuPg87Tha5wxkKSf0RRPHL6zLKAMrGw/viewform?usp=header" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-cyan-600 to-purple-600 rounded-lg font-semibold text-white neon-glow hover:from-cyan-700 hover:to-purple-700 transition-all transform hover:scale-105"
+                >
+                  <Send className="w-4 h-4 mr-2" />
+                  Open Contact Form in New Tab
+                </a>
               </div>
-
-              <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
-                  Email *
-                </label>
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  required
-                  className="w-full px-4 py-3 bg-black/50 border border-purple-500/30 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 transition-colors"
-                  placeholder="your.email@example.com"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="subject" className="block text-sm font-medium text-gray-300 mb-2">
-                  Subject *
-                </label>
-                <input
-                  type="text"
-                  id="subject"
-                  name="subject"
-                  value={formData.subject}
-                  onChange={handleInputChange}
-                  required
-                  className="w-full px-4 py-3 bg-black/50 border border-purple-500/30 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 transition-colors"
-                  placeholder="Brief description of your inquiry"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="message" className="block text-sm font-medium text-gray-300 mb-2">
-                  Message *
-                </label>
-                <textarea
-                  id="message"
-                  name="message"
-                  value={formData.message}
-                  onChange={handleInputChange}
-                  required
-                  rows={6}
-                  className="w-full px-4 py-3 bg-black/50 border border-purple-500/30 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 transition-colors resize-vertical"
-                  placeholder="Please provide as much detail as possible about your question or request..."
-                />
-              </div>
-
-              <button
-                type="submit"
-                disabled={!isFormValid || isSubmitting}
-                className="w-full flex items-center justify-center px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-500 rounded-lg font-semibold text-white neon-glow hover:from-purple-700 hover:to-pink-600 transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-              >
-                {isSubmitting ? (
-                  <>
-                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                    Sending...
-                  </>
-                ) : (
-                  <>
-                    <Send className="w-5 h-5 mr-2" />
-                    Send Message
-                  </>
-                )}
-              </button>
-            </form>
+            </div>
 
             <div className="mt-6 text-center">
               <p className="text-sm text-gray-400">
@@ -209,6 +115,109 @@ function ContactUs() {
                   Privacy Policy
                 </a>
               </p>
+            </div>
+          </div>
+        </div>
+
+        {/* We're Hiring Section */}
+        <div className="mt-16 pt-16 border-t border-purple-500/30">
+          <div className="text-center mb-12">
+            <div className="flex items-center justify-center mb-4">
+              <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-blue-500 rounded-lg flex items-center justify-center mr-4">
+                <Users className="w-6 h-6 text-white" />
+              </div>
+              <h2 className="text-3xl font-bold bg-gradient-to-r from-green-400 to-blue-400 bg-clip-text text-transparent">
+                We're Hiring!
+              </h2>
+            </div>
+            <p className="text-xl text-gray-300 leading-relaxed max-w-2xl mx-auto">
+              Join our innovative team and help shape the future of AI-powered software testing. We're looking for passionate individuals to work with us!
+            </p>
+          </div>
+
+          <div className="grid lg:grid-cols-3 gap-8">
+            {/* Why Join Us */}
+            <div className="glass-card p-6">
+              <div className="flex items-center mb-4">
+                <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-emerald-500 rounded-lg flex items-center justify-center mr-3">
+                  <Briefcase className="w-5 h-5 text-white" />
+                </div>
+                <h3 className="text-xl font-bold text-green-400">Why Join Us?</h3>
+              </div>
+              <ul className="space-y-3 text-gray-300">
+                <li className="flex items-center">
+                  <CheckCircle className="w-4 h-4 text-green-400 mr-2 flex-shrink-0" />
+                  <span>Work with cutting-edge AI technology</span>
+                </li>
+                <li className="flex items-center">
+                  <CheckCircle className="w-4 h-4 text-green-400 mr-2 flex-shrink-0" />
+                  <span>Remote-first culture</span>
+                </li>
+                <li className="flex items-center">
+                  <CheckCircle className="w-4 h-4 text-green-400 mr-2 flex-shrink-0" />
+                  <span>Competitive compensation</span>
+                </li>
+                <li className="flex items-center">
+                  <CheckCircle className="w-4 h-4 text-green-400 mr-2 flex-shrink-0" />
+                  <span>Growth opportunities</span>
+                </li>
+                <li className="flex items-center">
+                  <CheckCircle className="w-4 h-4 text-green-400 mr-2 flex-shrink-0" />
+                  <span>Innovative projects</span>
+                </li>
+              </ul>
+            </div>
+
+            {/* Application Form */}
+            <div className="lg:col-span-2">
+              <div className="glass-card p-8">
+                <div className="text-center mb-6">
+                  <h3 className="text-2xl font-bold text-blue-400 mb-3">Ready to Join Our Team?</h3>
+                  <p className="text-gray-300">
+                    Fill out this form to apply and tell us about yourself. We're excited to hear from you!
+                  </p>
+                </div>
+                
+                <div className="bg-gradient-to-r from-green-500/10 to-blue-500/10 border border-green-500/30 rounded-lg p-4 mb-6">
+                  <p className="text-center text-green-300 font-medium">
+                    🚀 Multiple positions available - Apply now!
+                  </p>
+                </div>
+
+                {/* Google Form Embed */}
+                <div className="relative">
+                  <div className="bg-black/30 rounded-lg overflow-hidden border border-purple-500/30">
+                    <iframe 
+                      src="https://docs.google.com/forms/d/e/1FAIpQLSfHgRzJ29bm58wmkJhcTL0cEM6Ug5zXqXz3eNfTwGm3L3IM8Q/viewform?embedded=true&usp=pp_url"
+                      width="100%" 
+                      height="800" 
+                      frameBorder="0" 
+                      marginHeight={0} 
+                      marginWidth={0}
+                      className="w-full"
+                      title="Job Application Form"
+                    >
+                      Loading…
+                    </iframe>
+                  </div>
+                  
+                  {/* Fallback link */}
+                  <div className="text-center mt-4">
+                    <p className="text-sm text-gray-400 mb-2">
+                      Having trouble with the form above?
+                    </p>
+                    <a 
+                      href="https://docs.google.com/forms/d/e/1FAIpQLSfHgRzJ29bm58wmkJhcTL0cEM6Ug5zXqXz3eNfTwGm3L3IM8Q/viewform?usp=header" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-green-600 to-blue-600 rounded-lg font-semibold text-white neon-glow hover:from-green-700 hover:to-blue-700 transition-all transform hover:scale-105"
+                    >
+                      <Users className="w-4 h-4 mr-2" />
+                      Open Application Form in New Tab
+                    </a>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
