@@ -390,25 +390,23 @@ export class ApiClient {
     
     // Debug: Log all form data before sending
     console.log('Submitting test with data:', {
-      test_name: request.test_name,
+      name: request.test_name,
       test_type: request.test_type,
-      requested_duration_minutes: request.requested_duration_minutes,
-      plan_type_at_submission: request.plan_type_at_submission,
-      test_source_url: request.test_source_url,
+      duration: request.requested_duration_minutes,
+      url: request.test_source_url,
       hasFile: !!request.file
     });
     
-    formData.append('test_name', request.test_name);
+    formData.append('name', request.test_name);
     formData.append('test_type', request.test_type);
-    formData.append('requested_duration_minutes', request.requested_duration_minutes.toString());
-    formData.append('plan_type_at_submission', request.plan_type_at_submission);
+    formData.append('duration', request.requested_duration_minutes.toString());
     
     if (request.test_source_url) {
-      formData.append('test_source_url', request.test_source_url);
+      formData.append('url', request.test_source_url);
     }
     
     if (request.file) {
-      formData.append('uploaded_file', request.file);
+      formData.append('file', request.file);
     }
 
     // Debug: Log FormData contents
