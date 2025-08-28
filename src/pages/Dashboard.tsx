@@ -6,7 +6,7 @@ import DashboardHeader from '../components/dashboard/DashboardHeader';
 import PlanUsage from '../components/dashboard/PlanUsage';
 import RecentTests from '../components/dashboard/RecentTests';
 import { supabase, Test } from '../lib/supabase';
-import { Rocket, Clock, Zap, Bug, TrendingUp, Eye, ArrowRight, Activity } from 'lucide-react';
+import { Rocket, Clock, Zap, Bug, TrendingUp, Eye, ArrowRight, Activity, Globe, Smartphone, CheckCircle, Play, XCircle, AlertTriangle, RefreshCw } from 'lucide-react';
 
 function Dashboard() {
   const { user, profile } = useAuth();

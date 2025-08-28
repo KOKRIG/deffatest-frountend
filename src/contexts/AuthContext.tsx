@@ -26,11 +26,13 @@ export function useAuth() {
 // Profile cache to avoid repeated fetches
 const PROFILE_CACHE_KEY = 'deffatest_profile_cache';
 const PROFILE_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+const PROFILE_CACHE_VERSION = '1.0'; // Version to invalidate old caches
 
 interface ProfileCache {
   profile: Profile;
   timestamp: number;
   userId: string;
+  version: string;
 }
 
 const getProfileFromCache = (userId: string): Profile | null => {
@@ -41,13 +43,15 @@ const getProfileFromCache = (userId: string): Profile | null => {
     const cacheData: ProfileCache = JSON.parse(cached);
     const now = Date.now();
     
-    // Check if cache is valid (not expired and for same user)
-    if (cacheData.userId === userId && (now - cacheData.timestamp) < PROFILE_CACHE_TTL) {
+    // Check if cache is valid (not expired, for same user, and correct version)
+    if (cacheData.userId === userId && 
+        (now - cacheData.timestamp) < PROFILE_CACHE_TTL &&
+        cacheData.version === PROFILE_CACHE_VERSION) {
       console.log('Profile loaded from cache');
       return cacheData.profile;
     }
     
-    // Clear expired cache
+    // Clear expired or invalid cache
     localStorage.removeItem(PROFILE_CACHE_KEY);
     return null;
   } catch (error) {
@@ -59,15 +63,23 @@ const getProfileFromCache = (userId: string): Profile | null => {
 
 const setProfileToCache = (userId: string, profile: Profile): void => {
   try {
+    // Validate profile before caching
+    if (!profile || !profile.user_id || profile.user_id !== userId) {
+      console.warn('Invalid profile data, skipping cache');
+      return;
+    }
+    
     const cacheData: ProfileCache = {
       profile,
       timestamp: Date.now(),
-      userId
+      userId,
+      version: PROFILE_CACHE_VERSION
     };
     localStorage.setItem(PROFILE_CACHE_KEY, JSON.stringify(cacheData));
     console.log('Profile cached successfully');
   } catch (error) {
     console.warn('Error caching profile:', error);
+    // Don't throw error, just log it
   }
 };
 

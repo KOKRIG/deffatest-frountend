@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Menu, X, Brain, FileText, Rocket, CheckCircle, Shield, Clock, Target } from 'lucide-react';
 import Logo from './components/Logo';
+import SEO from './components/SEO';
 
 function App() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -11,6 +12,12 @@ function App() {
 
   return (
     <div className="min-h-screen bg-black text-white relative overflow-x-hidden">
+      <SEO 
+        title="DEFFATEST - #1 AI-Powered App Testing Platform | Find Bugs Faster"
+        description="Revolutionary AI testing platform that finds more bugs faster than manual testing. Autonomous QA testing for web and mobile apps. Save 90% testing time. Try free!"
+        keywords="AI testing, automated testing, app testing, QA testing, mobile app testing, web testing, bug detection, software testing, autonomous testing, AI QA, test automation, quality assurance, deffatest"
+        url="https://deffatest.online"
+      />
       {/* Animated Background Overlay */}
       <div className="fixed inset-0 z-0 pointer-events-none">
         <div className="absolute inset-0 animated-grid-overlay"></div>

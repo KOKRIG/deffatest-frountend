@@ -25,6 +25,8 @@ import LogoPage from './pages/LogoPage.tsx';
 import ScrollToTop from './components/ScrollToTop.tsx';
 import ProtectedRoute from './components/ProtectedRoute.tsx';
 import LoadingScreen from './components/LoadingScreen.tsx';
+import ErrorBoundary from './components/ErrorBoundary.tsx';
+import { HelmetProvider } from 'react-helmet-async';
 import { AuthProvider } from './contexts/AuthContext.tsx';
 import { initializePaddle } from './lib/paddle.js';
 import './index.css';
@@ -91,11 +93,13 @@ clearStaleAuthData();
 preloadLogo().finally(() => {
   createRoot(document.getElementById('root')!).render(
     <StrictMode>
-      <BrowserRouter>
-        <AuthProvider>
-          <LoadingScreen />
-          <ScrollToTop />
-          <Routes>
+      <HelmetProvider>
+        <ErrorBoundary>
+          <BrowserRouter>
+            <AuthProvider>
+            <LoadingScreen />
+            <ScrollToTop />
+            <Routes>
             <Route path="/" element={<App />} />
             <Route path="/use-cases" element={<UseCases />} />
             <Route path="/features" element={<Features />} />
@@ -159,10 +163,12 @@ preloadLogo().finally(() => {
                 </ProtectedRoute>
               } 
             />
-          </Routes>
-          
-        </AuthProvider>
-      </BrowserRouter>
+            </Routes>
+            
+            </AuthProvider>
+          </BrowserRouter>
+        </ErrorBoundary>
+      </HelmetProvider>
     </StrictMode>
   );
 });
